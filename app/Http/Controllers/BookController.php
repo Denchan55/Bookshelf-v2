@@ -1,0 +1,40 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\Book;
+
+class BookController extends Controller
+{
+    public function index()
+    {
+        $books = Book::with('genres')->get();
+        return view('books.index', compact('books'));
+    }
+
+    public function create()
+    {
+        return view('books.create');
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'author' => 'required|string|max:255',
+            'isbn' => 'nullable|string|max:20',
+            'description' => 'nullable|string',
+            'image_url' => 'nullable|url',
+        ]);
+
+        Book::create($validated);
+
+        return redirect()->route('books.index')->with('success', '書籍を登録しました');
+    }
+    public function show(Book $book)
+{
+    return view('books.show', compact('book'));
+}
+
+}
