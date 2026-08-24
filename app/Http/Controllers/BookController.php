@@ -9,9 +9,12 @@ class BookController extends Controller
 {
     public function index()
     {
-        $books = Book::with('genres')->get();
-        return view('books.index', compact('books'));
-    }
+    $books = Book::with('genres')
+        ->orderBy('created_at', 'desc')
+        ->paginate(10);
+
+    return view('books.index', compact('books'));
+}
 
     public function create()
     {
