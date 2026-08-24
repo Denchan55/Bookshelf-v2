@@ -30,6 +30,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/ranking', [RankingController::class, 'index'])->name('ranking.index');
 });
 
+Route::get('/books/{book}', [BookController::class, 'show'])->name('books.show');
 
 Route::get('/', function () {
     return view('welcome');
