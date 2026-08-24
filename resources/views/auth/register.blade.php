@@ -31,16 +31,15 @@
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <a href="{{ route('login') }}" class="text-sm text-blue-600 underline hover:text-blue-800">
-                アカウントをお持ちの方
-            </a>
-        </div>
+<div class="flex items-center justify-end mt-4">
+    <a href="{{ route('login') }}" class="text-sm underline text-gray-700 hover:text-gray-900 mr-4">
+        アカウントをお持ちの方
+    </a>
 
-
-        <x-primary-button class="ml-4">
-            {{ __('登録') }}
-        </x-primary-button>
-        </div>
+    <button type="submit"
+        class="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-900">
+        登録
+    </button>
+</div>
     </form>
 </x-guest-layout>
