@@ -34,6 +34,12 @@ class BookController extends Controller
     }
     public function show(Book $book)
 {
+    // 書籍に紐づくジャンルとレビューを読み込む
+    $book->load([
+        'genres',
+        'reviews.user', // レビュー投稿者の名前表示が必要なため
+    ]);
+
     return view('books.show', compact('book'));
 }
 
