@@ -21,16 +21,20 @@ Route::get('/', function () {
 });
 
 Route::get('/books', [BookController::class, 'index'])->name('books.index');
-Route::get('/books/{book}', [BookController::class, 'show'])->name('books.show');
 
 //
 // 認証必須ページ
 //
 Route::middleware('auth')->group(function () {
 
-    // 書籍登録
-    Route::get('/books/create', [BookController::class, 'create'])->name('books.create');
-    Route::post('/books', [BookController::class, 'store'])->name('books.store');
+// 書籍登録
+    Route::get('/books/create', [BookController::class, 'create'])
+        ->name('books.create');
+    Route::post('/books', [BookController::class, 'store'])
+        ->name('books.store');
+
+    Route::get('/books/{book}', [BookController::class, 'show'])->name('books.show');
+
 
     // ジャンル
     Route::get('/genres', [GenreController::class, 'index'])->name('genres.index');

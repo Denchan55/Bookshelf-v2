@@ -46,12 +46,13 @@
 
     <!-- 出版日 -->
     <div>
-        <label for="published_date" class="block font-medium text-sm text-gray-700 mb-1">
+        <label for="published_at" class="block font-medium text-sm text-gray-700 mb-1">
             出版日 <span class="text-red-500">*</span>
         </label>
-        <input type="date" name="published_date" id="published_date" value="{{ old('published_date', $book->published_date ?? '') }}"
+        <input type="date" name="published_at" id="published_at"
+            value="{{ old('published_at', $book->published_at ?? '') }}"
             class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm block w-full">
-        @error('published_date')
+        @error('published_at')
             <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
         @enderror
     </div>
