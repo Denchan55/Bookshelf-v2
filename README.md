@@ -54,7 +54,7 @@ erDiagram
     users ||--o{ favorites : "favorites"
 
     books ||--o{ reviews : "has"
-    books ||--o{ favorite : "has"
+    books ||--o{ favorites : "has"
     books ||--o{ book_genres : "categorized"
 
     reviews ||--o{ likes : "liked by"
