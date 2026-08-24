@@ -8,7 +8,7 @@ erDiagram
     string remember_token
   }
 
-  book {
+  books {
     int id
     string title
     string author
@@ -18,7 +18,7 @@ erDiagram
     string image_path
   }
 
-  review {
+  reviews {
     int id
     int user_id
     int book_id
@@ -26,35 +26,38 @@ erDiagram
     string comment
   }
 
-  like {
+  likes {
     int id
     int user_id
     int review_id
   }
 
-  favorite{
+  favorites{
     int id
     int user_id
     int book_id
   }
 
-  genre{
+  genres{
     int id
     string name
   }
 
-  book_genre {
+  book_genres {
     int id PK
     int book_id
     int genre_id
   }
 
-    users ||--o{ review : "has"
-    users ||--o{ like : "likes"
-    users ||--o{ favorite : "favorites"
-    book ||--o{ review : "has"
-    book ||--o{ favorite : "has"
-    review ||--o{ like : "liked by"
-    book ||--o{ book_genre : "categorized"
-    genre ||--o{ book_genre : "has"
+    users ||--o{ reviews : "has"
+    users ||--o{ likes : "likes"
+    users ||--o{ favorites : "favorites"
+
+    books ||--o{ reviews : "has"
+    books ||--o{ favorite : "has"
+    books ||--o{ book_genres : "categorized"
+
+    reviews ||--o{ likes : "liked by"
+
+    genres ||--o{ book_genres : "has"
 ```
