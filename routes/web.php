@@ -10,34 +10,33 @@ use App\Http\Controllers\RankingController;
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
 */
-Route::middleware('auth')->group(function () {
-    Route::get('/books', [BookController::class, 'index'])->name('books.index');
 
-    // ⭐ 書籍登録画面（Create）
-    Route::get('/books/create', [BookController::class, 'create'])->name('books.create');
-
-    // ⭐ 書籍登録処理（Store）
-    Route::post('/books', [BookController::class, 'store'])->name('books.store');
-
-    Route::get('/genres', [GenreController::class, 'index'])->name('genres.index');
-    Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
-    Route::get('/ranking', [RankingController::class, 'index'])->name('ranking.index');
+//
+// 公開ページ（認証不要）
+//
+Route::get('/', function () {
+    return redirect('/books');
 });
 
+Route::get('/books', [BookController::class, 'index'])->name('books.index');
 Route::get('/books/{book}', [BookController::class, 'show'])->name('books.show');
 
-Route::get('/', function () {
-    return view('welcome');
-});
+//
+// 認証必須ページ
+//
 Route::middleware('auth')->group(function () {
-    Route::get('/books', [BookController::class, 'index']);
-    Route::get('/genres', [GenreController::class, 'index']);
-    Route::get('/favorites', [FavoriteController::class, 'index']);
-    Route::get('/ranking', [RankingController::class, 'index']);
+
+    // 書籍登録
+    Route::get('/books/create', [BookController::class, 'create'])->name('books.create');
+    Route::post('/books', [BookController::class, 'store'])->name('books.store');
+
+    // ジャンル
+    Route::get('/genres', [GenreController::class, 'index'])->name('genres.index');
+
+    // お気に入り一覧
+    Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
+
+    // ランキング
+    Route::get('/ranking', [RankingController::class, 'index'])->name('ranking.index');
 });
