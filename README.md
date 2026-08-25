@@ -6,9 +6,9 @@
 
 ## 使用技術
 
-- PHP 8.2
+- PHP 8.5
 - Laravel 10.x
-- MySQL 8.0
+- MySQL 8.4
 - Nginx
 - Docker / Docker Compose / Laravel Sail
 - Vite / Tailwind CSS 3.4
@@ -96,8 +96,8 @@ Node.js は Sail 内で動くためローカル不要（任意）
 
 2. 📥 リポジトリのクローン
    bash
-   git clone git@github.com:Denchan55/contact-form-app.git
-   cd contact-form-app
+   git clone git@github.com:Denchan55/bookshelf-v2.git
+   cd bookshelf-app
 3. 🛠 .env の作成と設定
    bash
    cp .env.example .env

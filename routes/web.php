@@ -38,6 +38,7 @@ Route::middleware('auth')->group(function () {
 
     // ジャンル
     Route::get('/genres', [GenreController::class, 'index'])->name('genres.index');
+    Route::resource('genres', GenreController::class);
 
     // お気に入り一覧
     Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
