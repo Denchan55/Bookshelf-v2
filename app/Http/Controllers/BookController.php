@@ -64,5 +64,52 @@ public function store(Request $request)
 
     return view('books.show', compact('book'));
 }
+public function edit(Book $book)
+{
+    // 自分の書籍かどうか認可チェック（必須）
+    $this->authorize('update', $book);
+
+    // ジャンル一覧
+    $genres = Genre::all();
+
+    // 書籍が持っているジャンルID（チェックボックスの初期値用）
+    $bookGenreIds = $book->genres->pluck('id')->toArray();
+
+    return view('books.edit', compact('book', 'genres', 'bookGenreIds'));
+}
+public function update(Request $request, Book $book)
+{
+    // 認可チェック
+    $this->authorize('update', $book);
+
+    // バリデーション
+    $validated = $request->validate([
+        'title' => 'required|string|max:255',
+        'author' => 'required|string|max:255',
+        'published_at' => 'required|date',
+        'isbn' => 'required|string|max:13',
+        'genres' => 'required|array',
+    ]);
+
+    // 書籍情報の更新
+    $book->update($validated);
+
+    // ジャンルの紐付け
+    $book->genres()->sync($validated['genres']);
+
+    // 詳細ページへ戻る
+    return redirect()->route('books.show', $book)
+        ->with('success', '書籍情報を更新しました');
+}
+public function destroy(Book $book)
+{
+    $this->authorize('update', $book);
+
+    $book->genres()->detach();
+    $book->delete();
+
+    return redirect()->route('books.index')
+        ->with('success', '書籍を削除しました');
+}
 
 }
