@@ -11,8 +11,11 @@ class FavoriteController extends Controller
 {
     public function index()
     {
+        $user = auth()->user();
     $favorites = Auth::user()->favoriteBooks()->get();
-    return view('favorites.index', compact('favorites'));
+    $favoriteBooks = $user->favoriteBooks()->paginate(10);
+    return view('favorites.index', ['books' => $favoriteBooks]);
+
 }
 
     public function toggle(Book $book)
