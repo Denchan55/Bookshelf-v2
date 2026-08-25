@@ -21,6 +21,12 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+    \Illuminate\Support\Facades\Gate::define('update', function ($user, $book) {
+        return $user->id === $book->user_id;
+    });
+    \Illuminate\Support\Facades\Gate::define('delete', function ($user, $book) {
+    return $user->id === $book->user_id;
+});
+
     }
 }
