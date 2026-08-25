@@ -13,21 +13,15 @@ use App\Http\Controllers\ReviewLikeController;
 |--------------------------------------------------------------------------
 */
 
-//
-// 公開ページ（認証不要）
-//
+
 Route::get('/', function () {
     return redirect('/books');
 });
 
 Route::get('/books', [BookController::class, 'index'])->name('books.index');
 
-//
-// 認証必須ページ
-//
 Route::middleware('auth')->group(function () {
 
-// 書籍登録
     Route::get('/books/create', [BookController::class, 'create'])
         ->name('books.create');
     Route::post('/books', [BookController::class, 'store'])
@@ -35,16 +29,13 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/books/{book}', [BookController::class, 'show'])->name('books.show');
 
-
-    // ジャンル
     Route::get('/genres', [GenreController::class, 'index'])->name('genres.index');
     Route::resource('genres', GenreController::class);
 
-    // お気に入り一覧
     Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
     Route::post('/favorites/{book}/toggle', [FavoriteController::class, 'toggle'])
         ->name('favorites.toggle');
-    // ランキング
+    
     Route::get('/ranking', [RankingController::class, 'index'])->name('ranking.index');
 
     Route::post('/books/{book}/reviews', [ReviewController::class, 'store'])

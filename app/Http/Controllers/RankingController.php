@@ -9,10 +9,13 @@ class RankingController extends Controller
 {
     public function index()
     {
-        $ranking = Book::withCount('favorites')
-            ->orderBy('favorites_count', 'desc')
+        $rankedBooks = Book::withAvg('reviews', 'rating')
+            ->withCount('reviews')
+            ->orderByDesc('reviews_avg_rating')
+            ->take(10)
             ->get();
 
-        return view('ranking.index', compact('ranking'));
+        return view('ranking.index', compact('rankedBooks'));
     }
+    
 }
