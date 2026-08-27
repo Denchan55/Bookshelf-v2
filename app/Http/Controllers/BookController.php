@@ -7,6 +7,7 @@ use App\Models\Book;
 use App\Models\Genre;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreBookRequest;
+use App\Http\Requests\UpdateBookRequest;
 
 class BookController extends Controller
 {
@@ -56,25 +57,15 @@ public function edit(Book $book)
 
     return view('books.edit', compact('book', 'genres', 'bookGenreIds'));
 }
-public function update(Request $request, Book $book)
+public function update(UpdateBookRequest $request, Book $book)
 {
-    $this->authorize('update', $book);
-
-    $validated = $request->validate([
-        'title' => 'required|string|max:255',
-        'author' => 'required|string|max:255',
-        'published_at' => 'required|date',
-        'isbn' => 'required|string|max:13',
-        'genres' => 'required|array',
-    ]);
-
-    $book->update($validated);
-
-    $book->genres()->sync($validated['genres']);
+    $book->update($request->validated());
+    $book->genres()->sync($request->genres);
 
     return redirect()->route('books.show', $book)
-        ->with('success', '書籍情報を更新しました');
+        ->with('success', '書籍を更新しました！');
 }
+
 public function destroy(Book $book)
 {
     $this->authorize('update', $book);
