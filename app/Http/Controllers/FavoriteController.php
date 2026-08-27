@@ -23,10 +23,9 @@ class FavoriteController extends Controller
     $user = Auth::user();
 
     if ($user->favoriteBooks()->where('book_id', $book->id)->exists()) {
-        // すでにお気に入り → 削除
+
         $user->favoriteBooks()->detach($book->id);
     } else {
-        // お気に入り追加
         $user->favoriteBooks()->attach($book->id);
     }
 
