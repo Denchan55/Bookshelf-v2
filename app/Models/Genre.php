@@ -14,5 +14,6 @@ class Genre extends Model
     return $this->belongsToMany(Book::class);
 }
 
+
     use HasFactory;
 }
