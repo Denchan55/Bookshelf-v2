@@ -29,6 +29,7 @@ erDiagram
 
   books {
     int id
+    int genre_id
     string title
     string author
     string isbn

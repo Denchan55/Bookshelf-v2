@@ -19,6 +19,7 @@ Route::get('/', function () {
 });
 
 Route::get('/books', [BookController::class, 'index'])->name('books.index');
+Route::get('/ranking', [RankingController::class, 'index'])->name('ranking.index');
 
 Route::middleware('auth')->group(function () {
 
@@ -27,17 +28,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/books', [BookController::class, 'store'])
         ->name('books.store');
 
-    Route::get('/books/{book}', [BookController::class, 'show'])->name('books.show');
-
     Route::get('/genres', [GenreController::class, 'index'])->name('genres.index');
     Route::resource('genres', GenreController::class);
+
 
     Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
     Route::post('/favorites/{book}/toggle', [FavoriteController::class, 'toggle'])
         ->name('favorites.toggle');
     
-    Route::get('/ranking', [RankingController::class, 'index'])->name('ranking.index');
-
     Route::post('/books/{book}/reviews', [ReviewController::class, 'store'])
     ->name('reviews.store');
     Route::post('/reviews/{review}/like', [ReviewLikeController::class, 'toggle'])
@@ -60,3 +58,4 @@ Route::middleware('auth')->group(function () {
     ->name('books.destroy');
 
 });
+Route::get('/books/{book}', [BookController::class, 'show'])->name('books.show');

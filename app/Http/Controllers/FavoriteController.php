@@ -9,15 +9,15 @@ use Illuminate\Support\Facades\Auth;
 
 class FavoriteController extends Controller
 {
-    public function index()
-    {
-        $user = auth()->user();
-    $favorites = Auth::user()->favoriteBooks()->get();
-    $favoriteBooks = $user->favoriteBooks()->paginate(10);
-    return view('favorites.index', ['books' => $favoriteBooks]);
+public function index()
+{
+    $books = Auth::user()
+        ->favoriteBooks()
+        ->with('genres')
+        ->paginate(10);
 
+    return view('favorites.index', compact('books'));
 }
-
     public function toggle(Book $book)
     {
     $user = Auth::user();

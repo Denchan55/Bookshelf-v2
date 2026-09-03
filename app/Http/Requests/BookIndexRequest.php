@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Api;
+namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -10,17 +10,23 @@ class BookIndexRequest extends FormRequest
     {
         return true;
     }
+    
+protected $redirect = null;
+    protected $redirectRoute = null;
+    protected $redirectUrl = null;
 
+    public function wantsJson()
+    {
+        return true;
+    }
     public function rules()
     {
+
         return [
             // キーワード検索
             'keyword' => ['nullable', 'string', 'max:255'],
-
-            // ページ番号（ページネーション）
             'page' => ['nullable', 'integer', 'min:1'],
-
-            // 1ページあたりの件数（負荷対策）
+            'genre_id' => ['nullable', 'integer', 'exists:genres,id'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
         ];
     }
