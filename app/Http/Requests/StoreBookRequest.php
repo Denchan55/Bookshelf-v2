@@ -27,8 +27,10 @@ class StoreBookRequest extends FormRequest
         'description' => 'nullable|string',
         'image_url' => 'nullable|url',
         'genres' => 'required|array',
+        'genres.*' => 'exists:genres,id',
         'isbn' => 'required|string|size:13|unique:books,isbn',
         'published_at' => 'required|date',
+
     ];
 }
 
@@ -39,6 +41,7 @@ public function messages()
         'author.required' => '著者名を入力してください。',
         'image_url.url' => '画像URLは有効なURL形式で入力してください。',
         'genres.required' => 'ジャンルを選択してください。',
+        'genres.*.exists' => '選択されたジャンルは存在しません。',
         'isbn.required' => 'ISBNを入力してください。',
         'isbn.size' => 'ISBNは13桁で入力してください。',
         'isbn.unique' => 'このISBNは既に登録されています。',

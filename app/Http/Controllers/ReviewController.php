@@ -6,16 +6,13 @@ use Illuminate\Http\Request;
 use App\Models\Review;
 use App\Models\Book;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\ReviewStoreRequest;
+use App\Http\Requests\ReviewUpdateRequest;
 
 class ReviewController extends Controller
 {
-    public function store(Request $request, Book $book)
+    public function store(ReviewStoreRequest $request, Book $book)
     {
-        $request->validate([
-            'rating' => 'required|integer|min:1|max:5',
-            'comment' => 'required|string|max:1000',
-        ]);
-
         Review::create([
             'user_id' => Auth::id(),
             'book_id' => $book->id,
@@ -23,26 +20,20 @@ class ReviewController extends Controller
             'comment' => $request->comment,
         ]);
 
-        return back()->with('success', 'レビューを投稿しました！');
+        return back()->with('success', 'レビューを投稿しました。');
     }
-public function update(Request $request, Review $review)
+public function update(ReviewUpdateRequest $request, Review $review)
 {
     if ($review->user_id !== Auth::id()) {
         abort(403);
     }
-
-    $request->validate([
-        'rating' => 'required|integer|min:1|max:5',
-        'comment' => 'required|string|max:1000',
-    ]);
-
     $review->update([
         'rating' => $request->rating,
         'comment' => $request->comment,
     ]);
 
     return redirect()->route('books.show', $review->book_id)
-                    ->with('success', 'レビューを更新しました！');
+                    ->with('success', 'レビューを更新しました。');
 }
 
     public function edit(Review $review)
@@ -55,7 +46,6 @@ public function update(Request $request, Review $review)
     return view('reviews.edit', compact('review'));
 }
 
-
 public function destroy(Review $review)
 {
     if ($review->user_id !== Auth::id()) {
@@ -65,7 +55,7 @@ public function destroy(Review $review)
     $review->delete();
 
     return redirect()->route('books.show', $review->book_id)
-                    ->with('success', 'レビューを削除しました！');
+                    ->with('success', 'レビューを削除しました。');
 }
 
     }

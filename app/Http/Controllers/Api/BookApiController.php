@@ -8,28 +8,40 @@ use App\Http\Resources\BookResource;
 use Illuminate\Http\Request;
 use App\Http\Requests\Api\StoreBookRequest;
 use App\Http\Requests\Api\UpdateBookRequest;
-use App\Http\Requests\Api\BookIndexRequest;
+use App\Http\Requests\BookIndexRequest;
 
 class BookApiController extends Controller
 {
     // 書籍一覧（検索・絞り込み・ページネーション対応）
 public function index(BookIndexRequest $request)
 {
-    $validated = $request->validated();
+    // バリデーションは FormRequest が実行済み
 
-    $query = Book::with('genres'); 
+    $keyword = $request->query('keyword');
+    $genreId = $request->query('genre_id');
+    $perPage = $request->query('per_page', 10); // デフォルト10
+    $page = $request->query('page', 1);
 
-    if (!empty($validated['keyword'])) {
-        $query->where('title', 'like', '%' . $validated['keyword'] . '%');
+    $query = Book::with('genres');
+
+    if (!empty($keyword)) {
+        $query->where(function ($q) use ($keyword) {
+            $q->where('title', 'like', "%{$keyword}%")
+            ->orWhere('author', 'like', "%{$keyword}%")
+            ->orWhere('description', 'like', "%{$keyword}%");
+        });
     }
 
-    $perPage = $validated['per_page'] ?? 10;
+    if (!empty($genreId)) {
+        $query->whereHas('genres', function ($q) use ($genreId) {
+            $q->where('genres.id', $genreId);
+        });
+    }
 
     return BookResource::collection(
         $query->orderBy('created_at', 'desc')->paginate($perPage)
     );
 }
-
 
     // 書籍詳細（ジャンル・レビュー含む）
     public function show(Book $book)
@@ -48,7 +60,7 @@ public function store(StoreBookRequest $request)
         'published_at' => $request->published_at,
         'description' => $request->description,
         'image_url' => $request->image_url,
-        'user_id' => 1,//auth()->id(), 
+        'user_id' => auth()->id(), 
     ]);
 
 
@@ -57,7 +69,6 @@ public function store(StoreBookRequest $request)
 $book->load('genres');
     return new BookResource($book);
 }
-
 public function update(UpdateBookRequest $request, Book $book)
 {
     // 書籍情報を更新
