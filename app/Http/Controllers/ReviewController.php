@@ -20,13 +20,13 @@ class ReviewController extends Controller
             'comment' => $request->comment,
         ]);
 
-        return back()->with('success', 'レビューを投稿しました。');
+        return redirect()->route('books.show', $book)
+        ->with('success', 'レビューを投稿しました！');
     }
 public function update(ReviewUpdateRequest $request, Review $review)
 {
-    if ($review->user_id !== Auth::id()) {
-        abort(403);
-    }
+    $this->authorize('update', $review);
+
     $review->update([
         'rating' => $request->rating,
         'comment' => $request->comment,
@@ -35,6 +35,7 @@ public function update(ReviewUpdateRequest $request, Review $review)
     return redirect()->route('books.show', $review->book_id)
                     ->with('success', 'レビューを更新しました。');
 }
+
 
     public function edit(Review $review)
 {
@@ -48,9 +49,7 @@ public function update(ReviewUpdateRequest $request, Review $review)
 
 public function destroy(Review $review)
 {
-    if ($review->user_id !== Auth::id()) {
-        abort(403);
-    }
+    $this->authorize('delete', $review);
 
     $review->delete();
 

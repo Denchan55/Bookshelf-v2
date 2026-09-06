@@ -22,7 +22,7 @@ public function index(BookIndexRequest $request)
     $perPage = $request->query('per_page', 10); // デフォルト10
     $page = $request->query('page', 1);
 
-    $query = Book::with('genres');
+    $query = Book::with('genres', 'reviews');
 
     if (!empty($keyword)) {
         $query->where(function ($q) use ($keyword) {
@@ -51,8 +51,7 @@ public function index(BookIndexRequest $request)
 
     // 書籍登録（バリデーション通過時に登録）
 public function store(StoreBookRequest $request)
-{ 
-
+{
     $book = Book::create([
         'title' => $request->title,
         'author' => $request->author,
@@ -60,15 +59,21 @@ public function store(StoreBookRequest $request)
         'published_at' => $request->published_at,
         'description' => $request->description,
         'image_url' => $request->image_url,
-        'user_id' => auth()->id(), 
+        'user_id' => auth()->id(),
     ]);
 
-
-    // 複数ジャンルを紐づける
+    // ジャンル紐付け
     $book->genres()->sync($request->genres);
-$book->load('genres');
-    return new BookResource($book);
+
+    // ⭐ Resource が必要とする関連をロード
+    $book->load(['genres', 'reviews']);
+
+    // ⭐ 201 Created で返す
+    return (new BookResource($book))
+        ->response()
+        ->setStatusCode(201);
 }
+
 public function update(UpdateBookRequest $request, Book $book)
 {
     // 書籍情報を更新
@@ -94,6 +99,9 @@ public function update(UpdateBookRequest $request, Book $book)
     // 書籍削除（関連データも削除）
     public function destroy(Book $book)
 {
+// ⭐ 認可チェック（これが必須）
+    $this->authorize('delete', $book);
+
     // 中間テーブルの紐付きを削除
     $book->genres()->detach();
 

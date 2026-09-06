@@ -20,5 +20,8 @@ public function delete(User $user, Review $review)
 {
     return $review->user_id === $user->id;
 }
-
+public function edit(User $user, Review $review)
+{
+    return $user->id === $review->user_id;
+}
 }

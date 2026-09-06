@@ -4,6 +4,12 @@ namespace App\Providers;
 
 // use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use App\Models\Book;
+use App\Models\Review;
+use App\Models\Favorite;
+use App\Policies\BookPolicy;
+use App\Policies\ReviewPolicy;
+use App\Policies\FavoritePolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -13,8 +19,11 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
-        \App\Models\Review::class => \App\Policies\ReviewPolicy::class,
-    ];
+    Book::class => BookPolicy::class,
+    Review::class => ReviewPolicy::class,
+    Favorite::class => FavoritePolicy::class,
+];
+
 
     /**
      * Register any authentication / authorization services.

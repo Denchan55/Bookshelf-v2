@@ -3,7 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-
+use Illuminate\Validation\Rule;
 class UpdateBookRequest extends FormRequest
 {
     /**
@@ -20,7 +20,7 @@ class UpdateBookRequest extends FormRequest
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
-    {
+{
     return [
         'title' => 'required|string|max:255',
         'author' => 'required|string|max:255',
@@ -28,7 +28,12 @@ class UpdateBookRequest extends FormRequest
         'image_url' => 'nullable|url',
         'genres' => 'required|array',
         'genres.*' => 'exists:genres,id',
-        'isbn' => 'required|string|size:13|unique:books,isbn,' . $this->book->id,
+        'isbn' => [
+            'required',
+            'string',
+            'size:13',
+            Rule::unique('books')->ignore($this->route('book')),
+        ],
         'published_at' => 'required|date',
     ];
 }
