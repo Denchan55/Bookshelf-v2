@@ -76,7 +76,7 @@ class BookUpdateTest extends TestCase
                 'title' => '新タイトル',
                 'author' => '新著者',
                 'isbn' => '9782222222222',
-                'published_at' => '2024-01-01',
+                'published_at' => '2024-01-01T00:00:00.000000Z',
                 'description' => '新しい説明文です。',
                 'image_url' => 'https://example.com/new.jpg',
             ]

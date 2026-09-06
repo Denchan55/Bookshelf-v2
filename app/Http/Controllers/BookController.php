@@ -74,15 +74,17 @@ public function store(StoreBookRequest $request)
     /**
      * 書籍編集フォーム
      */
-    public function edit(Book $book)
-    {
-        $this->authorize('update', $book);
+public function edit(Book $book)
+{
+    $this->authorize('update', $book);
 
-        $genres = Genre::all();
-        $bookGenreIds = $book->genres->pluck('id')->toArray();
+    $genres = Genre::all();
+    $bookGenreIds = $book->genres->pluck('id')->toArray();
 
-        return view('books.edit', compact('book', 'genres', 'bookGenreIds'));
-    }
+    return view('books.edit', compact('book', 'genres', 'bookGenreIds'));
+}
+
+
 
     /**
      * 書籍更新処理
