@@ -7,6 +7,7 @@ use App\Models\Genre;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
+use Illuminate\Session\Store;
 
 class BookController extends Controller
 {
@@ -36,23 +37,26 @@ class BookController extends Controller
     /**
      * 書籍登録処理
      */
-    public function store(StoreBookRequest $request)
-    {
-        $validated = $request->validated();
+public function store(StoreBookRequest $request)
+{
+    $book = Book::create([
+        'title' => $request->title,
+        'author' => $request->author,
+        'isbn' => $request->isbn,
+        'published_at' => $request->published_at,
+        'description' => $request->description,
+        'image_url' => $request->image_url,
+        'user_id' => auth()->id(),
+    ]);
 
-        // user_id は FormRequest ではなくコントローラーで付与する
-        $book = Book::create([
-            ...$validated,
-            'user_id' => Auth::id(),
-        ]);
+    // ★複数ジャンルを保存（これが絶対に必要）
+    $book->genres()->sync($request->genres);
 
-        // genres は配列で送られてくるので sync で紐付け
-        $book->genres()->sync($validated['genres']);
+    return redirect()
+        ->route('books.show', $book)
+        ->with('success', '書籍を登録しました。');
+}
 
-        return redirect()
-            ->route('books.show', $book)
-            ->with('success', '書籍を登録しました！');
-    }
 
     /**
      * 書籍詳細
@@ -85,14 +89,13 @@ class BookController extends Controller
      */
     public function update(UpdateBookRequest $request, Book $book)
     {
-        $validated = $request->validated();
+        $this->authorize('update', $book);
+        $book->update($request->validated());
 
-        $book->update($validated);
-        $book->genres()->sync($validated['genres']);
+        $book->genres()->sync($request->genres);
 
-        return redirect()
-            ->route('books.show', $book)
-            ->with('success', '書籍を更新しました！');
+        return redirect()->route('books.show', $book)
+                ->with('success', '書籍を更新しました。');
     }
 
     /**
@@ -100,13 +103,13 @@ class BookController extends Controller
      */
     public function destroy(Book $book)
     {
-        $this->authorize('update', $book);
+        $this->authorize('delete', $book);
 
         $book->genres()->detach();
         $book->delete();
 
         return redirect()
             ->route('books.index')
-            ->with('success', '書籍を削除しました');
+            ->with('success', '書籍を削除しました。');
     }
 }

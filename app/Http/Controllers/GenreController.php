@@ -20,15 +20,14 @@ public function create()
 }
 public function store(GenreStoreRequest $request)
 {
-    $validated = $request->validate([
-        'name' => 'required|string|max:255',
-    ]);
+    $validated = $request->validated();
 
     Genre::create($validated);
 
     return redirect()->route('genres.index')
         ->with('success', 'ジャンルを登録しました');
 }
+
 
 public function show(Genre $genre)
 {
@@ -51,6 +50,7 @@ public function update(GenreUpdateRequest $request, Genre $genre)
 }
 public function destroy(Genre $genre)
 {
+
     // 書籍との紐付けがある場合は削除禁止
     if ($genre->books()->exists()) {
         return redirect()->route('genres.index')
