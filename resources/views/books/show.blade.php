@@ -67,7 +67,7 @@
 
                             <p class="text-gray-600 mb-2"><strong>著者:</strong> {{ $book->author }}</p>
                             <p class="text-gray-600 mb-2"><strong>ISBN:</strong> {{ $book->isbn }}</p>
-                            <p class="text-gray-600 mb-2"><strong>出版日:</strong> {{ $book->published_at }}</p>
+                            <p class="text-gray-600 mb-2"><strong>出版日:</strong> {{ optional($book->published_at)->format('Y-m-d') }}</p>
                             <div class="mb-4">
                                 <strong>ジャンル:</strong>
                                 @foreach($book->genres as $genre)

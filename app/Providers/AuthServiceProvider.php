@@ -9,7 +9,6 @@ use App\Models\Review;
 use App\Models\Favorite;
 use App\Policies\BookPolicy;
 use App\Policies\ReviewPolicy;
-use App\Policies\FavoritePolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -21,7 +20,6 @@ class AuthServiceProvider extends ServiceProvider
     protected $policies = [
     Book::class => BookPolicy::class,
     Review::class => ReviewPolicy::class,
-    Favorite::class => FavoritePolicy::class,
 ];
 
 

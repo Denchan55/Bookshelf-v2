@@ -40,7 +40,7 @@ public function can_create_book()
                      'title' => 'Laravel入門',
                      'author' => '山田太郎',
                      'isbn' => '9781234567890',
-                     'published_at' => '2024-01-01',
+                     'published_at' => '2024-01-01T00:00:00.000000Z',
                      'description' => 'テスト用の説明文です。',
                  ]
              ]);
