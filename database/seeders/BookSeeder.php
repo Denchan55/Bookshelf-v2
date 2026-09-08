@@ -106,17 +106,16 @@ class BookSeeder extends Seeder
 
         foreach ($books as $index => $data) {
             
-            $book = Book::firstOrCreate(
-                ['isbn' => $data['isbn']],
-                [
-                    'title' => $data['title'],
-                    'author' => $data['author'],
-                    'published_at' => $data['published_at'],
-                    'description' => $data['description'],
-                    'image_url' => 'https://placehold.co/200x300/e2e8f0/475569?text=' . ($index + 1),
-                    'user_id' => $users->random()->id,
-                ]
-            );
+            $book = Book::create([
+    'title' => $data['title'],
+    'author' => $data['author'],
+    'isbn' => $data['isbn'],
+    'published_at' => $data['published_at'],
+    'description' => $data['description'],
+    'image_url' => 'https://placehold.co/200x300/e2e8f0/475569?text=' . ($index + 1),
+    'user_id' => $users->random()->id,
+]);
+
             $book->genres()->sync($data['genres']);
         }
     }
