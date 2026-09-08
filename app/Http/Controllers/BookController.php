@@ -8,20 +8,65 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
 use Illuminate\Session\Store;
+use Illuminate\Http\Request;
 
 class BookController extends Controller
 {
     /**
      * 書籍一覧
      */
-    public function index()
-    {
-        $books = Book::with('genres')
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+    public function index(Request $request)
+{
+    $query = Book::query()
+        ->with('genres')
+        ->withCount('reviews'); // 評価順ソート用
 
-        return view('books.index', compact('books'));
+    // キーワード検索
+    if ($request->filled('keyword')) {
+        $keyword = $request->keyword;
+        $query->where(function ($q) use ($keyword) {
+            $q->where('title', 'like', "%{$keyword}%")
+              ->orWhere('author', 'like', "%{$keyword}%")
+              ->orWhere('description', 'like', "%{$keyword}%");
+        });
     }
+
+    // ジャンルフィルタ（複数選択）
+    if ($request->filled('genre')) {
+    $genreId = $request->genre;
+    $query->whereHas('genres', function ($q) use ($genreId) {
+        $q->where('genres.id', $genreId);
+    });
+}
+
+
+    // ソート（新着順 / 古い順 / 評価順）
+    if ($request->filled('sort')) {
+        switch ($request->sort) {
+            case 'oldest':
+                $query->orderBy('published_date', 'asc');
+                break;
+
+            case 'rating':
+                $query->orderBy('reviews_count', 'desc');
+                break;
+
+            default:
+                $query->orderBy('published_date', 'desc');
+        }
+    } else {
+        // デフォルト：新着順
+        $query->orderBy('published_date', 'desc');
+    }
+
+    // ページネーション（検索条件維持）
+    $books = $query->paginate(10)->appends($request->query());
+
+    // ジャンル一覧（検索フォーム用）
+    $genres = Genre::all();
+
+    return view('books.index', compact('books', 'genres'));
+}
 
     /**
      * 書籍登録フォーム
@@ -43,7 +88,7 @@ public function store(StoreBookRequest $request)
         'title' => $request->title,
         'author' => $request->author,
         'isbn' => $request->isbn,
-        'published_at' => $request->published_at,
+        'published_date' => $request->published_date,
         'description' => $request->description,
         'image_url' => $request->image_url,
         'user_id' => auth()->id(),

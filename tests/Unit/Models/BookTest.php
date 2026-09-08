@@ -65,7 +65,7 @@ class BookTest extends TestCase
             'isbn' => '9781234567890',
             'description' => '説明文',
             'image_url' => 'https://example.com/img.jpg',
-            'published_at' => '2024-01-01',
+            'published_date' => '2024-01-01',
         ]);
 
         $this->assertEquals('吾輩は猫である', $book->title);
@@ -73,6 +73,6 @@ class BookTest extends TestCase
         $this->assertEquals('9781234567890', $book->isbn);
         $this->assertEquals('説明文', $book->description);
         $this->assertEquals('https://example.com/img.jpg', $book->image_url);
-        $this->assertEquals('2024-01-01', $book->published_at->format('Y-m-d'));
+        $this->assertEquals('2024-01-01', $book->published_date->format('Y-m-d'));
     }
 }

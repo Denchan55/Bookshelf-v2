@@ -16,7 +16,7 @@ public function toArray($request)
         'description' => $this->description,
         'image_url' => $this->image_url,
         'isbn' => $this->isbn,
-        'published_at' => $this->published_at,
+        'published_date' => $this->published_date,
 
         'genres' => $this->genres?->map(fn($genre) => [
             'id' => $genre->id,

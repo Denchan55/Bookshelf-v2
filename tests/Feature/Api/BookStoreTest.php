@@ -27,7 +27,7 @@ public function can_create_book()
         'title' => 'Laravel入門',
         'author' => '山田太郎',
         'isbn' => '9781234567890',
-        'published_at' => '2024-01-01',
+        'published_date' => '2024-01-01',
         'description' => 'テスト用の説明文です。',
         'genres' => [$genre->id],   // ⭐ これが必須
     ];
@@ -40,7 +40,7 @@ public function can_create_book()
                      'title' => 'Laravel入門',
                      'author' => '山田太郎',
                      'isbn' => '9781234567890',
-                     'published_at' => '2024-01-01T00:00:00.000000Z',
+                     'published_date' => '2024-01-01T00:00:00.000000Z',
                      'description' => 'テスト用の説明文です。',
                  ]
              ]);
@@ -65,7 +65,7 @@ public function title_is_required()
         'title' => '',
         'author' => '山田太郎',
         'isbn' => '9781234567890',
-        'published_at' => '2024-01-01',
+        'published_date' => '2024-01-01',
         'description' => '説明',
         'genres' => [\App\Models\Genre::factory()->create()->id],
     ];
@@ -81,7 +81,7 @@ public function author_is_required()
         'title' => 'Laravel入門',
         'author' => '',
         'isbn' => '9781234567890',
-        'published_at' => '2024-01-01',
+        'published_date' => '2024-01-01',
         'description' => '説明',
         'genres' => [\App\Models\Genre::factory()->create()->id],
     ];
@@ -97,7 +97,7 @@ public function description_must_be_string()
         'title' => 'Laravel入門',
         'author' => '山田太郎',
         'isbn' => '9781234567890',
-        'published_at' => '2024-01-01',
+        'published_date' => '2024-01-01',
         'description' => 123, // 数値はNG
         'genres' => [\App\Models\Genre::factory()->create()->id],
     ];
@@ -113,7 +113,7 @@ public function image_url_must_be_valid_url()
         'title' => 'Laravel入門',
         'author' => '山田太郎',
         'isbn' => '9781234567890',
-        'published_at' => '2024-01-01',
+        'published_date' => '2024-01-01',
         'description' => '説明',
         'image_url' => 'invalid-url',
         'genres' => [\App\Models\Genre::factory()->create()->id],
@@ -130,7 +130,7 @@ public function genres_is_required()
         'title' => 'Laravel入門',
         'author' => '山田太郎',
         'isbn' => '9781234567890',
-        'published_at' => '2024-01-01',
+        'published_date' => '2024-01-01',
         'description' => '説明',
         'genres' => null,
     ];
@@ -146,7 +146,7 @@ public function genres_must_be_array()
         'title' => 'Laravel入門',
         'author' => '山田太郎',
         'isbn' => '9781234567890',
-        'published_at' => '2024-01-01',
+        'published_date' => '2024-01-01',
         'description' => '説明',
         'genres' => 'not-array',
     ];
@@ -162,7 +162,7 @@ public function genres_must_exist()
         'title' => 'Laravel入門',
         'author' => '山田太郎',
         'isbn' => '9781234567890',
-        'published_at' => '2024-01-01',
+        'published_date' => '2024-01-01',
         'description' => '説明',
         'genres' => [99999], // 存在しない
     ];
@@ -178,7 +178,7 @@ public function isbn_is_required()
         'title' => 'Laravel入門',
         'author' => '山田太郎',
         'isbn' => '',
-        'published_at' => '2024-01-01',
+        'published_date' => '2024-01-01',
         'description' => '説明',
         'genres' => [\App\Models\Genre::factory()->create()->id],
     ];
@@ -194,7 +194,7 @@ public function isbn_must_be_13_characters()
         'title' => 'Laravel入門',
         'author' => '山田太郎',
         'isbn' => '123', // 13桁じゃない
-        'published_at' => '2024-01-01',
+        'published_date' => '2024-01-01',
         'description' => '説明',
         'genres' => [\App\Models\Genre::factory()->create()->id],
     ];
@@ -218,7 +218,7 @@ public function isbn_must_be_unique()
         'title' => 'Laravel入門',
         'author' => '山田太郎',
         'isbn' => '9781234567890', // 重複
-        'published_at' => '2024-01-01',
+        'published_date' => '2024-01-01',
         'description' => '説明',
         'genres' => [$genre->id],
     ];
@@ -228,36 +228,36 @@ public function isbn_must_be_unique()
          ->assertJsonValidationErrors(['isbn']);
 }
 /** @test */
-public function published_at_is_required()
+public function published_date_is_required()
 {
     $payload = [
         'title' => 'Laravel入門',
         'author' => '山田太郎',
         'isbn' => '9781234567890',
-        'published_at' => '',
+        'published_date' => '',
         'description' => '説明',
         'genres' => [\App\Models\Genre::factory()->create()->id],
     ];
 
     $this->postJson('/api/v1/books', $payload)
          ->assertStatus(422)
-         ->assertJsonValidationErrors(['published_at']);
+         ->assertJsonValidationErrors(['published_date']);
 }
 /** @test */
-public function published_at_must_be_valid_date()
+public function published_date_must_be_valid_date()
 {
     $payload = [
         'title' => 'Laravel入門',
         'author' => '山田太郎',
         'isbn' => '9781234567890',
-        'published_at' => 'invalid-date',
+        'published_date' => 'invalid-date',
         'description' => '説明',
         'genres' => [\App\Models\Genre::factory()->create()->id],
     ];
 
     $this->postJson('/api/v1/books', $payload)
          ->assertStatus(422)
-         ->assertJsonValidationErrors(['published_at']);
+         ->assertJsonValidationErrors(['published_date']);
 }
 
 

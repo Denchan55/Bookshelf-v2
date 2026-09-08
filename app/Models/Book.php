@@ -13,14 +13,14 @@ class Book extends Model
         'title',
         'author',
         'isbn',
-        'published_at',
+        'published_date',
         'description',
         'image_url',
         'user_id',
     ];
 
     protected $casts = [
-        'published_at' => 'date',
+        'published_date' => 'date',
     ];
 
     // ⭐ 追加：ユーザーとのリレーション

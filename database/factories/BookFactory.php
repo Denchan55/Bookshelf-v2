@@ -13,7 +13,7 @@ class BookFactory extends Factory
             'title' => $this->faker->sentence(),
             'author' => $this->faker->name(),
             'isbn' => $this->faker->unique()->isbn13(),
-            'published_at' => $this->faker->date(),
+            'published_date' => $this->faker->date(),
             'description' => $this->faker->paragraph(),
             'image_url' => 'https://placehold.co/200x300', // ★正しい値
             'user_id' => User::factory(), // ★OK

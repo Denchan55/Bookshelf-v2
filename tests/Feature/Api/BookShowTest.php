@@ -34,7 +34,7 @@ class BookShowTest extends TestCase
         'title',
         'author',
         'isbn',
-        'published_at',
+        'published_date',
         'image_url',
         'genres',
         'average_rating',

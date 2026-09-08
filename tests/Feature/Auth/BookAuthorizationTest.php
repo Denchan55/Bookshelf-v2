@@ -50,7 +50,7 @@ class BookAuthorizationTest extends TestCase
             'author' => '新しい著者名',
             'genres' => $genres->pluck('id')->toArray(),
             'isbn' => '1234567890123',
-            'published_at' => '2024-01-01',
+            'published_date' => '2024-01-01',
             'image_url' => null,
         ]);
 
@@ -74,7 +74,7 @@ class BookAuthorizationTest extends TestCase
             'author' => 'Updated Author',
             'genres' => $genres->pluck('id')->toArray(),
             'isbn' => '1234567890123',
-            'published_at' => '2024-01-01',
+            'published_date' => '2024-01-01',
         ]);
 
         $response->assertStatus(403);
