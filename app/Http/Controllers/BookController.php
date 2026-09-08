@@ -44,7 +44,7 @@ class BookController extends Controller
     if ($request->filled('sort')) {
         switch ($request->sort) {
             case 'oldest':
-                $query->orderBy('published_at', 'asc');
+                $query->orderBy('published_date', 'asc');
                 break;
 
             case 'rating':
@@ -52,11 +52,11 @@ class BookController extends Controller
                 break;
 
             default:
-                $query->orderBy('published_at', 'desc');
+                $query->orderBy('published_date', 'desc');
         }
     } else {
         // デフォルト：新着順
-        $query->orderBy('published_at', 'desc');
+        $query->orderBy('published_date', 'desc');
     }
 
     // ページネーション（検索条件維持）
@@ -88,7 +88,7 @@ public function store(StoreBookRequest $request)
         'title' => $request->title,
         'author' => $request->author,
         'isbn' => $request->isbn,
-        'published_at' => $request->published_at,
+        'published_date' => $request->published_date,
         'description' => $request->description,
         'image_url' => $request->image_url,
         'user_id' => auth()->id(),

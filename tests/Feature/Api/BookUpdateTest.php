@@ -23,7 +23,7 @@ class BookUpdateTest extends TestCase
             'title' => '旧タイトル',
             'author' => '旧著者',
             'isbn' => '9781111111111',
-            'published_at' => '2020-01-01',
+            'published_date' => '2020-01-01',
             'description' => '旧説明',
             'image_url' => 'https://example.com/old.jpg',
             'user_id' => auth()->id(),
@@ -42,7 +42,7 @@ class BookUpdateTest extends TestCase
             'title' => '旧タイトル',
             'author' => '旧著者',
             'isbn' => '9781111111111',
-            'published_at' => '2020-01-01',
+            'published_date' => '2020-01-01',
             'description' => '旧説明',
             'image_url' => 'https://example.com/old.jpg',
             'user_id' => auth()->id(),
@@ -59,7 +59,7 @@ class BookUpdateTest extends TestCase
             'title' => '新タイトル',
             'author' => '新著者',
             'isbn' => '9782222222222',
-            'published_at' => '2024-01-01',
+            'published_date' => '2024-01-01',
             'description' => '新しい説明文です。',
             'image_url' => 'https://example.com/new.jpg',
             'genres' => [$genre2->id], // ⭐ sync が正しく動くか確認
@@ -76,7 +76,7 @@ class BookUpdateTest extends TestCase
                 'title' => '新タイトル',
                 'author' => '新著者',
                 'isbn' => '9782222222222',
-                'published_at' => '2024-01-01T00:00:00.000000Z',
+                'published_date' => '2024-01-01T00:00:00.000000Z',
                 'description' => '新しい説明文です。',
                 'image_url' => 'https://example.com/new.jpg',
             ]
@@ -112,7 +112,7 @@ public function title_is_required()
         'title' => '',
         'author' => '新著者',
         'isbn' => '9782222222222',
-        'published_at' => '2024-01-01',
+        'published_date' => '2024-01-01',
         'description' => '説明',
         'genres' => [Genre::factory()->create()->id],
     ];
@@ -130,7 +130,7 @@ public function author_is_required()
         'title' => '新タイトル',
         'author' => '',
         'isbn' => '9782222222222',
-        'published_at' => '2024-01-01',
+        'published_date' => '2024-01-01',
         'description' => '説明',
         'genres' => [Genre::factory()->create()->id],
     ];
@@ -148,7 +148,7 @@ public function description_must_be_string()
         'title' => '新タイトル',
         'author' => '新著者',
         'isbn' => '9782222222222',
-        'published_at' => '2024-01-01',
+        'published_date' => '2024-01-01',
         'description' => 123,
         'genres' => [Genre::factory()->create()->id],
     ];
@@ -166,7 +166,7 @@ public function image_url_must_be_valid_url()
         'title' => '新タイトル',
         'author' => '新著者',
         'isbn' => '9782222222222',
-        'published_at' => '2024-01-01',
+        'published_date' => '2024-01-01',
         'description' => '説明',
         'image_url' => 'invalid-url',
         'genres' => [Genre::factory()->create()->id],
@@ -185,7 +185,7 @@ public function genres_is_required()
         'title' => '新タイトル',
         'author' => '新著者',
         'isbn' => '9782222222222',
-        'published_at' => '2024-01-01',
+        'published_date' => '2024-01-01',
         'description' => '説明',
         'genres' => null,
     ];
@@ -203,7 +203,7 @@ public function genres_must_be_array()
         'title' => '新タイトル',
         'author' => '新著者',
         'isbn' => '9782222222222',
-        'published_at' => '2024-01-01',
+        'published_date' => '2024-01-01',
         'description' => '説明',
         'genres' => 'not-array',
     ];
@@ -221,7 +221,7 @@ public function genres_must_exist()
         'title' => '新タイトル',
         'author' => '新著者',
         'isbn' => '9782222222222',
-        'published_at' => '2024-01-01',
+        'published_date' => '2024-01-01',
         'description' => '説明',
         'genres' => [99999],
     ];
@@ -239,7 +239,7 @@ public function isbn_is_required()
         'title' => '新タイトル',
         'author' => '新著者',
         'isbn' => '',
-        'published_at' => '2024-01-01',
+        'published_date' => '2024-01-01',
         'description' => '説明',
         'genres' => [Genre::factory()->create()->id],
     ];
@@ -257,7 +257,7 @@ public function isbn_must_be_13_characters()
         'title' => '新タイトル',
         'author' => '新著者',
         'isbn' => '123',
-        'published_at' => '2024-01-01',
+        'published_date' => '2024-01-01',
         'description' => '説明',
         'genres' => [Genre::factory()->create()->id],
     ];
@@ -281,7 +281,7 @@ public function isbn_must_be_unique_except_self()
         'title' => '新タイトル',
         'author' => '新著者',
         'isbn' => '9789999999999', // 他の本と重複
-        'published_at' => '2024-01-01',
+        'published_date' => '2024-01-01',
         'description' => '説明',
         'genres' => [Genre::factory()->create()->id],
     ];
@@ -291,7 +291,7 @@ public function isbn_must_be_unique_except_self()
          ->assertJsonValidationErrors(['isbn']);
 }
 /** @test */
-public function published_at_is_required()
+public function published_date_is_required()
 {
     $book = $this->createBook();
 
@@ -299,17 +299,17 @@ public function published_at_is_required()
         'title' => '新タイトル',
         'author' => '新著者',
         'isbn' => '9782222222222',
-        'published_at' => '',
+        'published_date' => '',
         'description' => '説明',
         'genres' => [Genre::factory()->create()->id],
     ];
 
     $this->putJson("/api/v1/books/{$book->id}", $payload)
          ->assertStatus(422)
-         ->assertJsonValidationErrors(['published_at']);
+         ->assertJsonValidationErrors(['published_date']);
 }
 /** @test */
-public function published_at_must_be_valid_date()
+public function published_date_must_be_valid_date()
 {
     $book = $this->createBook();
 
@@ -317,14 +317,14 @@ public function published_at_must_be_valid_date()
         'title' => '新タイトル',
         'author' => '新著者',
         'isbn' => '9782222222222',
-        'published_at' => 'invalid-date',
+        'published_date' => 'invalid-date',
         'description' => '説明',
         'genres' => [Genre::factory()->create()->id],
     ];
 
     $this->putJson("/api/v1/books/{$book->id}", $payload)
          ->assertStatus(422)
-         ->assertJsonValidationErrors(['published_at']);
+         ->assertJsonValidationErrors(['published_date']);
 }
 
 }

@@ -24,7 +24,7 @@ class BookDeleteTest extends TestCase
             'title' => '削除対象',
             'author' => '著者',
             'isbn' => '9781111111111',
-            'published_at' => '2020-01-01',
+            'published_date' => '2020-01-01',
             'description' => '説明',
             'image_url' => 'https://example.com/img.jpg',
             'user_id' => auth()->id(),

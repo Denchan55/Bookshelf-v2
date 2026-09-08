@@ -28,7 +28,7 @@ class BookIndexTest extends TestCase
                             'title',
                             'author',
                             'isbn',
-                            'published_at',
+                            'published_date',
                             'image_url',
                             'genres',
                             'average_rating',
@@ -109,4 +109,33 @@ class BookIndexTest extends TestCase
         $response->assertStatus(200)
                 ->assertJsonPath('data.0.genres.0.name', '技術書');
     }
+public function test_books_index_default_per_page_is_20()
+{
+    Book::factory()->count(50)->create();
+
+    $response = $this->getJson('/api/books');
+
+    $response->assertStatus(200)
+             ->assertJsonCount(20, 'data');
+}
+public function test_books_index_per_page_50()
+{
+    Book::factory()->count(100)->create();
+
+    $response = $this->getJson('/api/books?per_page=50');
+
+    $response->assertStatus(200)
+             ->assertJsonCount(50, 'data');
+}
+public function test_books_index_per_page_max_is_100()
+{
+    Book::factory()->count(200)->create();
+
+    $response = $this->getJson('/api/books?per_page=200');
+
+    $response->assertStatus(200)
+             ->assertJsonCount(100, 'data');
+}
+
+
 }

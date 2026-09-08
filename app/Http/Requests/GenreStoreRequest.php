@@ -32,6 +32,7 @@ class GenreStoreRequest extends FormRequest
         'name.string'   => 'ジャンル名は文字列で入力してください。',
         'name.max'      => 'ジャンル名は255文字以内で入力してください。',
         'name.unique'   => 'そのジャンル名は既に使用されています。',
+        'genres.required'   => 'ジャンルは一つ以上選択してください。',
     ];
 }
 }

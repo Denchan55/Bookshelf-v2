@@ -26,7 +26,7 @@ class BookStoreTest extends TestCase
         'title' => '吾輩は猫である',
         'author' => '夏目漱石',
         'isbn' => '9784101010014',
-        'published_at' => '1905-01-01',
+        'published_date' => '1905-01-01',
         'description' => 'テスト用の説明文です。',
         'image_url' => null, // ★ nullable|url を満たすため必須
         'genres' => $genres->pluck('id')->toArray(), // ★複数ジャンル
@@ -66,7 +66,7 @@ public function test_book_store_fails_when_title_is_empty()
         'title' => '',
         'author' => '夏目漱石',
         'isbn' => '9784101010014',
-        'published_at' => '1905-01-01',
+        'published_date' => '1905-01-01',
         'description' => '説明文',
         'image_url' => null, 
         'genres' => [$genre->id],
@@ -96,7 +96,7 @@ $book = Book::factory()->create([
         'title' => '新しい本',
         'author' => '誰か',
         'isbn' => '9784101010014', // ★重複
-        'published_at' => '2020-01-01',
+        'published_date' => '2020-01-01',
         'description' => '説明文',
         'image_url' => null,
         'genres' => $genres->pluck('id')->toArray(),
@@ -108,7 +108,7 @@ $book = Book::factory()->create([
     $response->assertSessionHasErrors(['isbn']);
 }
 
-public function test_book_store_fails_when_published_at_is_invalid()
+public function test_book_store_fails_when_published_date_is_invalid()
 {
     $user = User::factory()->create();
     $this->actingAs($user);
@@ -119,7 +119,7 @@ public function test_book_store_fails_when_published_at_is_invalid()
         'title' => '吾輩は猫である',
         'author' => '夏目漱石',
         'isbn' => '9784101010014',
-        'published_at' => 'invalid-date',
+        'published_date' => 'invalid-date',
         'description' => '説明文',
         'image_url' => null, 
         'genres' => [$genre->id],
@@ -128,7 +128,7 @@ public function test_book_store_fails_when_published_at_is_invalid()
     $response = $this->post('/books', $postData);
 
     $response->assertStatus(302);
-    $response->assertSessionHasErrors(['published_at']);
+    $response->assertSessionHasErrors(['published_date']);
 }
 public function test_book_store_fails_when_genres_is_empty()
 {
@@ -139,7 +139,7 @@ public function test_book_store_fails_when_genres_is_empty()
         'title' => '吾輩は猫である',
         'author' => '夏目漱石',
         'isbn' => '9784101010014',
-        'published_at' => '1905-01-01',
+        'published_date' => '1905-01-01',
         'description' => '説明文',
         'image_url' => null, 
         'genres' => [], // ★空
@@ -159,7 +159,7 @@ public function test_book_store_fails_when_genres_contains_invalid_id()
         'title' => '吾輩は猫である',
         'author' => '夏目漱石',
         'isbn' => '9784101010014',
-        'published_at' => '1905-01-01',
+        'published_date' => '1905-01-01',
         'description' => '説明文',
         'image_url' => null, 
         'genres' => [99999], // ★存在しないID

@@ -33,7 +33,7 @@ class BookShowTest extends TestCase
         'title' => '人を動かす',
         'author' => 'D・カーネギー',
         'isbn' => '9784422100524',
-        'published_at' => '1936-01-01',
+        'published_date' => '1936-01-01',
         'description' => '人間関係を円滑にする名著。',
     ]);
 

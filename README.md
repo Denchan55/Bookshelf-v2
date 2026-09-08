@@ -33,7 +33,7 @@ erDiagram
     string title
     string author
     string isbn
-    string published_at
+    string published_date
     string description
     string image_path
   }

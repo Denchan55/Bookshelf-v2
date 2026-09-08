@@ -19,7 +19,7 @@ public function index(BookIndexRequest $request)
 
     $keyword = $request->query('keyword');
     $genreId = $request->query('genre_id');
-    $perPage = $request->query('per_page', 10); // デフォルト10
+    $perPage = min($request->integer('per_page', 20), 100);
     $page = $request->query('page', 1);
 
     $query = Book::with('genres', 'reviews');
@@ -56,14 +56,15 @@ public function store(StoreBookRequest $request)
         'title' => $request->title,
         'author' => $request->author,
         'isbn' => $request->isbn,
-        'published_at' => $request->published_at,
+        'published_date' => $request->published_date,
         'description' => $request->description,
         'image_url' => $request->image_url,
         'user_id' => auth()->id(),
     ]);
 
     // ジャンル紐付け
-    $book->genres()->sync($request->genres);
+    $book->genres()->sync([$request->genre_id]);
+
 
     // ⭐ Resource が必要とする関連をロード
     $book->load(['genres', 'reviews']);
@@ -81,13 +82,13 @@ public function update(UpdateBookRequest $request, Book $book)
         'title' => $request->title,
         'author' => $request->author,
         'isbn' => $request->isbn,
-        'published_at' => $request->published_at,
+        'published_date' => $request->published_date,
         'description' => $request->description,
         'image_url' => $request->image_url,
     ]);
 
     // ジャンルを更新
-    $book->genres()->sync($request->genres);
+    $book->genres()->sync([$request->genre_id]);
 
     // リレーションをロード
     $book->load('genres');
