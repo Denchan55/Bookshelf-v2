@@ -47,7 +47,7 @@ public function messages()
         'author.string' => '著者名は文字列で入力してください。',
         'author.max' => '著者名は255文字以内で入力してください。',
         'image_url.url' => '画像URLは有効なURL形式で入力してください。',
-        'image_url.string' => '画像URLは文字列で入力してください。',
+        'image_url.max' => '画像URLは255文字以内で入力してください。',
         'genres.required' => 'ジャンルは必須です。',
         'genres.array' => 'ジャンルは配列で入力してください。',
         'genres.*.exists' => '選択されたジャンルは存在しません。',

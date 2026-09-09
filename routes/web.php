@@ -22,21 +22,22 @@ Route::get('/', function () {
     return redirect('/books');
 });
 
-Route::get('/books', [BookController::class, 'index'])->name('books.index');
+    Route::get('/books/isbn/{isbn}', [BookController::class, 'searchIsbn'])
+    ->where('isbn', '.*');
+
+
 Route::get('/ranking', [RankingController::class, 'index'])->name('ranking.index');
+
 
 Route::middleware('auth')->group(function () {
 
     Route::get('/books/create', [BookController::class, 'create'])
         ->name('books.create');
-    Route::post('/books', [BookController::class, 'store'])
-        ->name('books.store');
-        // ISBN検索（応用で新規追加）
-Route::post('/books/isbn-search', [BookController::class, 'isbnSearch'])->name('books.isbnSearch');
+    
+        Route::post('/books', [BookController::class, 'store'])->name('books.store');
 
     Route::get('/genres', [GenreController::class, 'index'])->name('genres.index');
     Route::resource('genres', GenreController::class);
-
 
     Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
     Route::post('/favorites/{book}/toggle', [FavoriteController::class, 'toggle'])
@@ -75,4 +76,5 @@ Route::get('/reports', [MyReportController::class, 'index'])
 Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
 
 });
+Route::get('/books', [BookController::class, 'index'])->name('books.index');
 Route::get('/books/{book}', [BookController::class, 'show'])->name('books.show');
