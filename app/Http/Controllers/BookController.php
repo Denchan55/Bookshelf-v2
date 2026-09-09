@@ -9,6 +9,7 @@ use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
 use Illuminate\Session\Store;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class BookController extends Controller
 {
@@ -26,8 +27,8 @@ class BookController extends Controller
         $keyword = $request->keyword;
         $query->where(function ($q) use ($keyword) {
             $q->where('title', 'like', "%{$keyword}%")
-              ->orWhere('author', 'like', "%{$keyword}%")
-              ->orWhere('description', 'like', "%{$keyword}%");
+                ->orWhere('author', 'like', "%{$keyword}%")
+                ->orWhere('description', 'like', "%{$keyword}%");
         });
     }
 
@@ -78,6 +79,27 @@ class BookController extends Controller
 
         return view('books.create', compact('genres', 'bookGenreIds'));
     }
+public function searchIsbn(string $isbn)
+{
+    $response = Http::get('https://www.googleapis.com/books/v1/volumes', [
+        'q' => 'isbn:' . $isbn,
+    ]);
+
+    if ($response->failed() || empty($response['items'])) {
+        return response()->json(['error' => '書籍が見つかりませんでした。'], 404);
+    }
+
+    $book = $response['items'][0]['volumeInfo'];
+
+    return [
+        'title' => $book['title'] ?? null,
+        'author' => $book['authors'][0] ?? null,
+        'published_date' => $book['publishedDate'] ?? null,
+        'description' => $book['description'] ?? null,
+        'image_url' => $book['imageLinks']['thumbnail'] ?? null,
+    ];
+}
+
 
     /**
      * 書籍登録処理

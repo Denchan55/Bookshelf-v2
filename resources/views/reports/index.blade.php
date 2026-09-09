@@ -1,3 +1,14 @@
+@php
+    $stats = $stats ?? [
+        'summary' => [
+            'total_reviews' => 0,
+            'books_read' => 0,
+            'average_rating' => 0,
+        ]
+    ];
+@endphp
+
+
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -13,11 +24,13 @@
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">基本統計</h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div class="border rounded-lg p-6 text-center">
-                            <div class="text-4xl font-bold text-blue-600 mb-2">{{ $stats['summary']['total_reviews'] }}</div>
+                            <div class="text-4xl font-bold text-blue-600 mb-2">{{ $stats['summary']['total_reviews'] }}
+                            </div>
                             <div class="text-sm text-gray-600">総レビュー数</div>
                         </div>
                         <div class="border rounded-lg p-6 text-center">
-                            <div class="text-4xl font-bold text-green-600 mb-2">{{ $stats['summary']['books_read'] }}</div>
+                            <div class="text-4xl font-bold text-green-600 mb-2">{{ $stats['summary']['books_read'] }}
+                            </div>
                             <div class="text-sm text-gray-600">読了冊数</div>
                         </div>
                         <div class="border rounded-lg p-6 text-center">
@@ -52,7 +65,8 @@
                                     </div>
                                     <div class="flex-1 mx-3">
                                         <div class="bg-gray-200 rounded-full h-5 overflow-hidden">
-                                            <div class="bg-yellow-400 h-5 rounded-full transition-all duration-300" style="width: {{ $percentage }}%"></div>
+                                            <div class="bg-yellow-400 h-5 rounded-full transition-all duration-300"
+                                                style="width: {{ $percentage }}%"></div>
                                         </div>
                                     </div>
                                     <div class="w-12 text-sm text-gray-600 text-right font-medium">{{ $count }}件</div>
@@ -77,8 +91,10 @@
                                         ];
                                         $rankColor = $rankColors[$index] ?? 'bg-gray-200 text-gray-600';
                                     @endphp
-                                    <a href="{{ route('books.show', $book['id']) }}" class="flex items-center p-3 border rounded-lg hover:shadow-md transition">
-                                        <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full {{ $rankColor }} font-bold text-sm">
+                                    <a href="{{ route('books.show', $book['id']) }}"
+                                        class="flex items-center p-3 border rounded-lg hover:shadow-md transition">
+                                        <div
+                                            class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full {{ $rankColor }} font-bold text-sm">
                                             {{ $index + 1 }}
                                         </div>
                                         <div class="flex-grow min-w-0 ml-3">
@@ -114,8 +130,10 @@
                                     ];
                                     $rankColor = $rankColors[$index] ?? 'bg-gray-200 text-gray-600';
                                 @endphp
-                                <a href="{{ route('genres.show', $genre['id']) }}" class="flex items-center p-4 border rounded-lg hover:shadow-md transition">
-                                    <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full {{ $rankColor }} font-bold text-sm">
+                                <a href="{{ route('genres.show', $genre['id']) }}"
+                                    class="flex items-center p-4 border rounded-lg hover:shadow-md transition">
+                                    <div
+                                        class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full {{ $rankColor }} font-bold text-sm">
                                         {{ $index + 1 }}
                                     </div>
                                     <div class="flex-grow ml-3">
@@ -123,7 +141,8 @@
                                         <div class="text-sm text-gray-500">{{ $genre['count'] }}件のレビュー</div>
                                     </div>
                                     <div class="flex-shrink-0 ml-3 text-right">
-                                        <div class="text-lg font-bold text-yellow-500">{{ number_format($genre['average_rating'], 1) }}</div>
+                                        <div class="text-lg font-bold text-yellow-500">
+                                            {{ number_format($genre['average_rating'], 1) }}</div>
                                         <div class="text-xs text-gray-400">平均評価</div>
                                     </div>
                                 </a>

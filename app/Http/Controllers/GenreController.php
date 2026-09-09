@@ -11,7 +11,8 @@ class GenreController extends Controller
 {
     public function index()
     {
-        $genres = Genre::all();
+        $genres = Genre::withCount('books')->get();
+
         return view('genres.index', compact('genres'));
     }
 public function create()
