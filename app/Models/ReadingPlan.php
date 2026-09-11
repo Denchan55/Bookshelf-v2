@@ -7,18 +7,21 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class ReadingPlan extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'user_id',
         'book_id',
         'status',
-        'due_date',
+        'target_date',
         'completed_at',
         'reminder_sent_at',
     ];
 
-    // リレーション（後で使う）
+    protected $casts = [
+        'target_date' => 'date',
+        'completed_at' => 'datetime',
+        'status' => \App\Enums\ReadingPlanStatus::class,
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);

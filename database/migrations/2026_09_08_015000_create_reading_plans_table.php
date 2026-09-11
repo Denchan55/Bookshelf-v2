@@ -22,7 +22,7 @@ return new class extends Migration
     $table->string('status')->default('not_started')->index();
 
     // 期限
-    $table->date('due_date')->nullable();
+    $table->date('target_date')->nullable();
 
     // 完了日時
     $table->timestamp('completed_at')->nullable();

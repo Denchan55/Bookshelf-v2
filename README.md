@@ -164,3 +164,48 @@ Seeder により初期データ（タグ・管理者ユーザーなど）が自�
 | POST         | /api/v1/books         | 書籍登録 |
 | PUT          | /api/v1/books/{books} | 書籍更新 |
 | DELETE       | /api/v1/books/{books} | 書籍削除 |
+
+## 通知機能の動作確認方法
+
+本アプリでは、読書計画に応じて以下の 4 種類の通知が自動生成されます。
+
+期限 3 日前通知
+期限当日通知
+期限超過通知
+放置通知（一定期間更新がない場合）
+
+通知は Laravel 標準の Notification（DatabaseChannel） を使用して
+notifications テーブルに保存されます。
+
+1. 手動で通知を生成する（採点者向け）
+   本番運用ではスケジューラにより自動生成されますが、
+   ローカル環境では以下のコマンドで手動実行できます。
+
+コード
+./vendor/bin/sail artisan reading-plan:notify
+実行後、ログインユーザーの通知一覧ページに通知が追加されます。
+
+2. スケジューラの動作確認（任意）
+   通知の自動生成は Laravel のスケジューラ（Schedule）を使用しています。
+   スケジューラに登録されたコマンドを手動で実行するには以下を使用します。
+
+コード
+./vendor/bin/sail artisan schedule:run
+※ daily() 実行のため、実行タイミングによっては通知が生成されない場合があります。
+※ 動作確認は上記の「手動実行」で確実に再現できます。
+
+3. スケジューラ設定（参考）
+   app/Console/Kernel.php にて、通知生成コマンドを毎日実行するよう設定しています。
+
+php
+protected function schedule(Schedule $schedule)
+{
+$schedule->command('reading-plan:notify')->daily();
+} 4. 通知の確認方法
+通知は以下の画面で確認できます。
+
+通知一覧ページ
+未読バッジ（ヘッダー）
+notifications テーブル
+
+既読ボタンを押すことで通知を既読状態にできます。
