@@ -89,11 +89,11 @@ public function cannot_delete_book_twice()
 
     // 1回目（成功）
     $this->deleteJson("/api/v1/books/{$book->id}")
-         ->assertStatus(204);
+        ->assertStatus(204);
 
     // 2回目（存在しないので404）
     $this->deleteJson("/api/v1/books/{$book->id}")
-         ->assertStatus(404);
+        ->assertStatus(404);
 }
 
 
