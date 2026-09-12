@@ -40,7 +40,6 @@ class BookController extends Controller
     });
 }
 
-
     // ソート（新着順 / 古い順 / 評価順）
     if ($request->filled('sort')) {
         switch ($request->sort) {
@@ -99,8 +98,6 @@ public function searchIsbn(string $isbn)
         'image_url' => $book['imageLinks']['thumbnail'] ?? null,
     ];
 }
-
-
     /**
      * 書籍登録処理
      */
@@ -115,16 +112,12 @@ public function store(StoreBookRequest $request)
         'image_url' => $request->image_url,
         'user_id' => auth()->id(),
     ]);
-
     // ★複数ジャンルを保存（これが絶対に必要）
     $book->genres()->sync($request->genres);
-
     return redirect()
         ->route('books.show', $book)
         ->with('success', '書籍を登録しました。');
 }
-
-
     /**
      * 書籍詳細
      */
@@ -134,10 +127,8 @@ public function store(StoreBookRequest $request)
             'genres',
             'reviews.user',
         ]);
-
         return view('books.show', compact('book'));
     }
-
     /**
      * 書籍編集フォーム
      */
@@ -151,14 +142,13 @@ public function edit(Book $book)
     return view('books.edit', compact('book', 'genres', 'bookGenreIds'));
 }
 
-
-
     /**
      * 書籍更新処理
      */
     public function update(UpdateBookRequest $request, Book $book)
     {
         $this->authorize('update', $book);
+        
         $book->update($request->validated());
 
         $book->genres()->sync($request->genres);

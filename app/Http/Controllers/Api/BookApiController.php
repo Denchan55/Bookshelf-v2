@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\Api\StoreBookRequest;
 use App\Http\Requests\Api\UpdateBookRequest;
 use App\Http\Requests\BookIndexRequest;
+use App\Http\Resources\BookListResource;
 
 class BookApiController extends Controller
 {
@@ -20,9 +21,8 @@ public function index(BookIndexRequest $request)
     $keyword = $request->query('keyword');
     $genreId = $request->query('genre_id');
     $perPage = min($request->integer('per_page', 20), 100);
-    $page = $request->query('page', 1);
 
-    $query = Book::with('genres', 'reviews');
+    $query = Book::with('genres');
 
     if (!empty($keyword)) {
         $query->where(function ($q) use ($keyword) {
@@ -38,16 +38,17 @@ public function index(BookIndexRequest $request)
         });
     }
 
-    return BookResource::collection(
+    return BookListResource::collection(
         $query->orderBy('created_at', 'desc')->paginate($perPage)
     );
 }
 
     // 書籍詳細（ジャンル・レビュー含む）
     public function show(Book $book)
-    {
-        return new BookResource($book);
-    }
+{
+    return new BookResource($book->load('genres', 'reviews.user'));
+}
+
 
     // 書籍登録（バリデーション通過時に登録）
 public function store(StoreBookRequest $request)
@@ -63,7 +64,7 @@ public function store(StoreBookRequest $request)
     ]);
 
     // ジャンル紐付け
-    $book->genres()->sync([$request->genre_id]);
+    $book->genres()->sync($request->genres);
 
 
     // ⭐ Resource が必要とする関連をロード
@@ -77,6 +78,7 @@ public function store(StoreBookRequest $request)
 
 public function update(UpdateBookRequest $request, Book $book)
 {
+    $this->authorize('update', $book);
     // 書籍情報を更新
     $book->update([
         'title' => $request->title,
@@ -88,7 +90,8 @@ public function update(UpdateBookRequest $request, Book $book)
     ]);
 
     // ジャンルを更新
-    $book->genres()->sync([$request->genre_id]);
+    $book->genres()->sync($request->genres);
+
 
     // リレーションをロード
     $book->load('genres');

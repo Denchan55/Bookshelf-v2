@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\BookApiController;
+use App\Http\Controllers\Api\AuthTokenController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -17,23 +19,22 @@ use App\Http\Controllers\Api\BookApiController;
 
 Route::prefix('v1')->group(function () {
 
-    // 書籍登録（バリデーション通過時に登録）
-    Route::post('/books', [BookApiController::class, 'store']);
+    // ⭐ 認証不要（トークン発行）
+    Route::post('/auth/token', [AuthTokenController::class, 'store']);
 
-    // 書籍一覧（検索・絞り込み・ページネーション対応）
+    // ⭐ 認証必須の書き込み系
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/books', [BookApiController::class, 'store']);
+        Route::put('/books/{book}', [BookApiController::class, 'update']);
+        Route::delete('/books/{book}', [BookApiController::class, 'destroy']);
+
+    });
+
+    // ⭐ 読み取り系（認証不要）
     Route::get('/books', [BookApiController::class, 'index']);
-
-    // 書籍詳細（ジャンル・レビュー含む）
     Route::get('/books/{book}', [BookApiController::class, 'show']);
-
-
-
-    // 書籍更新（存在しないIDはエラー）
-    Route::put('/books/{book}', [BookApiController::class, 'update']);
-
-    // 書籍削除（関連データも削除）
-    Route::delete('/books/{book}', [BookApiController::class, 'destroy']);
 });
+
 
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();
