@@ -2,35 +2,35 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 class LogoutTest extends TestCase
 {
     use RefreshDatabase;
 
-public function test_logout_success()
-{
-    $user = User::factory()->create();
-    $this->actingAs($user);
+    #[Test]
+    public function test_logout_success()
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
 
-    $response = $this->post('/logout');
+        $response = $this->post('/logout');
 
-    // Fortify はログアウト後は / に戻る
-    $response->assertRedirect('/');
+        $response->assertRedirect('/');
 
-    $this->assertGuest();
-}
+        $this->assertGuest();
+    }
 
-public function test_logout_when_not_logged_in()
-{
-    $response = $this->post('/logout');
+    #[Test]
+    public function test_logout_when_not_logged_in()
+    {
+        $response = $this->post('/logout');
 
-    // Fortify は未ログインで logout を叩くと /login に飛ばす
-    $response->assertRedirect('/login');
+        $response->assertRedirect('/login');
 
-    $this->assertGuest();
-}
-
+        $this->assertGuest();
+    }
 }

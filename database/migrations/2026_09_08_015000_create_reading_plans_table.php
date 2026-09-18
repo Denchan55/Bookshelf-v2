@@ -6,38 +6,30 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('reading_plans', function (Blueprint $table) {
-    $table->id();
+            $table->id();
 
-    // 紐づくユーザーと書籍
-    $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-    $table->foreignId('book_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('book_id')->constrained()->cascadeOnDelete();
 
-    // 読書状態（未読・読書中・完了）
-    $table->string('status')->default('not_started')->index();
+            $table->string('status')->default('not_started')->index();
 
-    // 期限
-    $table->date('target_date')->nullable();
+            $table->date('target_date')->nullable();
 
-    // 完了日時
-    $table->timestamp('completed_at')->nullable();
+            $table->timestamp('completed_at')->nullable();
 
-    // 通知済み日時
-    $table->timestamp('reminder_sent_at')->nullable();
+            $table->timestamp('reminder_sent_at')->nullable();
+            $table->timestamp('deadline_today_sent_at')->nullable();
+            $table->timestamp('deadline_passed_sent_at')->nullable();
+            $table->timestamp('expired_sent_at')->nullable();
 
-    $table->timestamps();
-});
+            $table->timestamps();
 
+        });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('reading_plans');

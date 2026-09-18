@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class BookResource extends JsonResource
@@ -18,19 +17,22 @@ class BookResource extends JsonResource
             'isbn' => $this->isbn,
             'published_date' => optional($this->published_date)->format('Y-m-d'),
 
-            // ⭐ ジャンル情報（仕様書に必須）
-            'genres' => $this->genres->map(fn($genre) => [
+            'genres' => $this->genres->map(fn ($genre) => [
                 'id' => $genre->id,
                 'name' => $genre->name,
             ]),
 
-            // ⭐ レビュー一覧（仕様書に必須）
-            'reviews' => $this->reviews->map(fn($review) => [
+            'reviews' => $this->reviews->map(fn ($review) => [
                 'user_name' => $review->user->name,
                 'rating' => $review->rating,
                 'comment' => $review->comment,
                 'created_at' => $review->created_at->format('Y-m-d H:i:s'),
             ]),
+            'average_rating' => $this->reviews->avg('rating') !== null
+            ? (float) number_format($this->reviews->avg('rating'), 1)
+            : null,
+
+            'review_count' => $this->reviews->count(),
         ];
     }
 }

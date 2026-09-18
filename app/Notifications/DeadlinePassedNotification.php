@@ -18,17 +18,17 @@ class DeadlinePassedNotification extends Notification
 
     public function via($notifiable)
     {
-        return ['database']; // DB通知を使う
+        return ['database'];
     }
 
     public function toDatabase($notifiable)
     {
         return [
-        'title' => '期限が超過しました',
-        'body' => '読書計画の期限が超過しました。',
-        'timing' => 'deadline_passed',
-        'plan_id' => $this->plan->id,
-        'target_date' => $this->plan->target_date,
+            'title' => '期限が超過しました',
+            'body' => '読書計画の期限が超過しました。',
+            'timing' => 'three_days_after',
+            'plan_id' => $this->plan->id,
+            'target_date' => $this->plan->target_date,
         ];
     }
 }

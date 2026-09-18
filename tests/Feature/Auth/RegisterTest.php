@@ -2,14 +2,16 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 class RegisterTest extends TestCase
 {
     use RefreshDatabase;
 
+    #[Test]
     public function test_register_success()
     {
         $response = $this->post('/register', [
@@ -19,7 +21,6 @@ class RegisterTest extends TestCase
             'password_confirmation' => 'password123',
         ]);
 
-        // Fortify の登録後は / にリダイレクト
         $response->assertRedirect('/books');
 
         $this->assertAuthenticated();
@@ -28,6 +29,7 @@ class RegisterTest extends TestCase
         ]);
     }
 
+    #[Test]
     public function test_register_fails_with_duplicate_email()
     {
         User::factory()->create([
@@ -46,6 +48,7 @@ class RegisterTest extends TestCase
         $this->assertGuest();
     }
 
+    #[Test]
     public function test_register_fails_with_invalid_password()
     {
         $response = $this->post('/register', [
@@ -60,6 +63,7 @@ class RegisterTest extends TestCase
         $this->assertGuest();
     }
 
+    #[Test]
     public function test_logged_in_user_cannot_access_register_page()
     {
         $user = User::factory()->create();
@@ -67,7 +71,6 @@ class RegisterTest extends TestCase
 
         $response = $this->get('/register');
 
-        // Fortify はログイン済みで register にアクセスすると / に飛ばす
         $response->assertRedirect('/books');
     }
 }

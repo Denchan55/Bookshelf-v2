@@ -1,4 +1,7 @@
-# COACHTECH Bookshelf書籍レビューアプリ
+# COACHTECH BookShelf 書籍レビューアプリ
+
+BookShelf は、読書管理を効率化し、ユーザー同士の書籍レビュー共有を促進するための Web アプリケーションです。
+書籍の登録・閲覧・レビュー投稿・お気に入り登録に加え、ジャンル分類、レビューへのいいね、ランキング、読書計画、通知機能、マイ読書レポートなど、読書体験を総合的にサポートする機能を備えています。
 
 ## 作成者
 
@@ -8,19 +11,33 @@
 
 - PHP 8.5
 - Laravel 10.x
+- Laravel Sanctum（API 認証）
+- Laravel Fortify（ユーザー認証）
+- Laravel Notification（DatabaseChannel）
+- Laravel Scheduler
+- Laravel Eloquent ORM
+- Laravel Artisan Console
+- PHPUnit / Pest
+
+- Vite
+- Tailwind CSS 3.4
+
+- Docker / Docker Compose
+- Laravel Sail
+
 - MySQL 8.4
 - Nginx
-- Docker / Docker Compose / Laravel Sail
-- Vite / Tailwind CSS 3.4
-- Laravel Fortify（認証）
 - phpMyAdmin
 
-##　ER図
+- Mermaid（ER 図作成）
+- Git / GitHub
+- WSL2（Windows 開発環境）##　ER図
 
 ```mermaid
 erDiagram
+
   users {
-    int id
+    bigint id PK
     string name
     string email
     string password
@@ -28,184 +45,207 @@ erDiagram
   }
 
   books {
-    int id
-    int genre_id
+    bigint id PK
     string title
     string author
     string isbn
-    string published_date
+    date published_date
     string description
-    string image_path
+    string image_url
+    bigint user_id FK
   }
 
-  reviews {
-    int id
-    int user_id
-    int book_id
-    string rating
-    string comment
-  }
-
-  likes {
-    int id
-    int user_id
-    int review_id
-  }
-
-  favorites{
-    int id
-    int user_id
-    int book_id
-  }
-
-  genres{
-    int id
+  genres {
+    bigint id PK
     string name
   }
 
   book_genres {
-    int id PK
-    int book_id
-    int genre_id
+    bigint id PK
+    bigint book_id FK
+    bigint genre_id FK
+    timestamps
+    unique book_id, genre_id
   }
 
-    users ||--o{ reviews : "has"
-    users ||--o{ likes : "likes"
-    users ||--o{ favorites : "favorites"
+  reviews {
+    bigint id PK
+    bigint user_id FK
+    bigint book_id FK
+    tinyint rating
+    string comment
+  }
 
-    books ||--o{ reviews : "has"
-    books ||--o{ favorites : "has"
-    books ||--o{ book_genres : "categorized"
+  likes {
+    bigint id PK
+    bigint user_id FK
+    bigint review_id FK
+  }
 
-    reviews ||--o{ likes : "liked by"
+  favorites {
+    bigint id PK
+    bigint user_id FK
+    bigint book_id FK
+  }
 
-    genres ||--o{ book_genres : "has"
+  reading_plans {
+    bigint id PK
+    bigint user_id FK
+    bigint book_id FK
+    string status
+    date target_date
+    timestamp completed_at
+    timestamp reminder_sent_at
+  }
+
+  notifications {
+    uuid id PK
+    string type
+    string notifiable_type
+    bigint notifiable_id
+    json data
+    timestamp read_at
+  }
+
+  users ||--o{ reviews : "writes"
+  users ||--o{ likes : "likes"
+  users ||--o{ favorites : "favorites"
+  users ||--o{ reading_plans : "plans"
+
+  books ||--o{ reviews : "has"
+  books ||--o{ favorites : "favorited"
+  books ||--o{ book_genres : "categorized"
+  books ||--o{ reading_plans : "planned"
+
+  reviews ||--o{ likes : "liked by"
+
+  genres ||--o{ book_genres : "has"
+
 ```
 
-🚀 環境構築手順（Setup Guide）
+## 環境構築手順（Setup Guide）
 
-1. 📌 前提条件（Prerequisites）
-   以下がインストールされている必要があります：
+1. 前提条件（Prerequisites）
 
-Docker Desktop
+- Docker Desktop
+- Git
+- （Windows）WSL2
+- Node.js（任意、Sail 内で動作）
 
-Git
+2. リポジトリのクローン
 
-（Windows の場合）WSL2 が有効化されていること
+```bash
+git clone git@github.com:Denchan55/Bookshelf-v2.git
+```
 
-Node.js は Sail 内で動くためローカル不要（任意）
+```bash
+cd bookshelf-v2
+```
 
-2. 📥 リポジトリのクローン
-   bash
-   git clone git@github.com:Denchan55/bookshelf-v2.git
-   cd bookshelf-app
-3. 🛠 .env の作成と設定
-   bash
-   cp .env.example .env
-   必要に応じて以下を確認・修正：
+3. 依存関係をインストール
 
-コード
+```bash
+composer install
+```
+
+4. .env の作成と設定
+
+```bash
+cp .env.example .env
+```
+
+必要に応じて以下を確認・修正
+
+```bash
 DB_CONNECTION=mysql
 DB_HOST=mysql
 DB_PORT=3306
-DB_DATABASE=contact_form
+DB_DATABASE=laravel
 DB_USERNAME=sail
-DB_PASSWORD=password 4. 🐳 Docker（Laravel Sail）の起動
-bash
-./vendor/bin/sail up -d 5. 📦 依存関係のインストール
-bash
-./vendor/bin/sail composer install
+DB_PASSWORD=password
+DB_DATABASE_TESTING=testing
+```
+
+5. Docker（Laravel Sail）の起動
+
+```bash
+./vendor/bin/sail up -d
+```
+
+6. 依存関係のインストール
+
+```bash
 ./vendor/bin/sail npm install
-./vendor/bin/sail npm run dev 6. 🔑 アプリケーションキーの生成
-bash
-./vendor/bin/sail artisan key:generate 7. 🗄 マイグレーション & シーディング
-bash
-./vendor/bin/sail artisan migrate --seed 8. 🌐 アクセス方法
-アプリケーション
-http://localhost/books
+./vendor/bin/sail npm run dev
+```
 
-phpMyAdmin
-http://localhost:8080
+7. アプリケーションキーの生成
 
-🧪 テスト実行（任意）
-bash
+```bash
+./vendor/bin/sail artisan key:generate
+```
+
+8. マイグレーション & シーディング
+
+```bash
+./vendor/bin/sail artisan migrate --seed
+```
+
+9. アクセス方法
+
+- アプリケーション: http://localhost
+- 書籍一覧: http://localhost/books
+- 読書計画: http://localhost/reading-plans
+- マイ読書レポート: http://localhost/reports
+- phpMyAdmin: http://localhost:8080
+
+テスト実行
+
+```bash
 ./vendor/bin/sail artisan test
-📁 ディレクトリ構成（抜粋）
-コード
-contact-form-app/
-├── app/
-├── database/
-│ ├── migrations/
-│ ├── seeders/
-│ └── factories/
-├── resources/
-├── routes/
-├── tests/
-└── docker-compose.yml
-📝 補足（Notes）
+```
+
+補足（Notes）
 Vite のポート競合が起きた場合は npm run dev を再実行してください。
-
 Docker の初回起動には時間がかかる場合があります。
-
-Seeder により初期データ（タグ・管理者ユーザーなど）が自動投入されます。
-
-🎉 完了
-以上で環境構築は完了です。
-アプリケーションを起動し、動作を確認してください。
+Seeder により初期データ（書籍データ・ユーザーなど）が自動投入されます。
 
 ## APIエンドポイント一覧
 
 認証不要の公開APIです。全エンドポイントは `/api/v1` プレフィックス配下に定義されています。
 
-| HTTPメソッド | URI                   | 概要     |
-| ------------ | --------------------- | -------- |
-| GET          | /api/v1/books         | 書籍一覧 |
-| GET          | /api/v1/books/{book}  | 書籍詳細 |
-| POST         | /api/v1/books         | 書籍登録 |
-| PUT          | /api/v1/books/{books} | 書籍更新 |
-| DELETE       | /api/v1/books/{books} | 書籍削除 |
+| HTTPメソッド | URI                   | 概要                       |
+| ------------ | --------------------- | -------------------------- |
+| GET          | /api/v1/books         | 書籍一覧                   |
+| GET          | /api/v1/books/{book}  | 書籍詳細                   |
+| POST         | /api/v1/books         | 書籍登録（201 Created）    |
+| PUT          | /api/v1/books/{books} | 書籍更新（200 OK）         |
+| DELETE       | /api/v1/books/{books} | 書籍削除（204 No Content） |
 
 ## 通知機能の動作確認方法
 
-本アプリでは、読書計画に応じて以下の 4 種類の通知が自動生成されます。
+手動実行
 
-期限 3 日前通知
-期限当日通知
-期限超過通知
-放置通知（一定期間更新がない場合）
-
-通知は Laravel 標準の Notification（DatabaseChannel） を使用して
-notifications テーブルに保存されます。
-
-1. 手動で通知を生成する（採点者向け）
-   本番運用ではスケジューラにより自動生成されますが、
-   ローカル環境では以下のコマンドで手動実行できます。
-
-コード
+```bash
 ./vendor/bin/sail artisan reading-plan:notify
-実行後、ログインユーザーの通知一覧ページに通知が追加されます。
+```
 
-2. スケジューラの動作確認（任意）
-   通知の自動生成は Laravel のスケジューラ（Schedule）を使用しています。
-   スケジューラに登録されたコマンドを手動で実行するには以下を使用します。
+スケジューラ実行
 
-コード
+```bash
 ./vendor/bin/sail artisan schedule:run
-※ daily() 実行のため、実行タイミングによっては通知が生成されない場合があります。
-※ 動作確認は上記の「手動実行」で確実に再現できます。
+```
 
-3. スケジューラ設定（参考）
-   app/Console/Kernel.php にて、通知生成コマンドを毎日実行するよう設定しています。
+スケジューラ設定（参考）
 
+```bash
 php
 protected function schedule(Schedule $schedule)
 {
-$schedule->command('reading-plan:notify')->daily();
-} 4. 通知の確認方法
-通知は以下の画面で確認できます。
+$schedule->command('reading-plan:notify')->dailyAt('20:00');
+}
+```
 
-通知一覧ページ
-未読バッジ（ヘッダー）
-notifications テーブル
-
-既読ボタンを押すことで通知を既読状態にできます。
+完了
+以上で環境構築は完了です。
+アプリケーションを起動し、動作を確認してください。

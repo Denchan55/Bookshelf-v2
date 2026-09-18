@@ -7,6 +7,7 @@ enum ReadingPlanStatus: string
     case NOT_STARTED = 'not_started';
     case IN_PROGRESS = 'in_progress';
     case Completed = 'completed';
+    case Expired = 'expired';
 
     public function label(): string
     {
@@ -14,6 +15,7 @@ enum ReadingPlanStatus: string
             self::NOT_STARTED => '未読',
             self::IN_PROGRESS => '進行中',
             self::Completed => '完了',
+            self::Expired => '失効'
         };
     }
 
@@ -23,6 +25,7 @@ enum ReadingPlanStatus: string
             self::NOT_STARTED => 'bg-gray-200 text-gray-800',
             self::IN_PROGRESS => 'bg-blue-200 text-blue-800',
             self::Completed => 'bg-green-200 text-green-800',
+            self::Expired => 'bg-red-200 text-red-800',
         };
     }
 }

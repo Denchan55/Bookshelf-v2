@@ -13,17 +13,16 @@ class ReadingPlanStoreRequest extends FormRequest
     }
 
     public function rules()
-{
-    return [
-        'book_id' => [
-            'required',
-            Rule::unique('reading_plans')->where(fn ($q) =>
-                $q->where('user_id', auth()->id())
-            ),
-        ],
-        'target_date' => ['required', 'date'],
-    ];
-}
+    {
+        return [
+            'book_id' => [
+                'required',
+                Rule::unique('reading_plans')->where(fn ($q) => $q->where('user_id', auth()->id())
+                ),
+            ],
+            'target_date' => ['required', 'date'],
+        ];
+    }
 
     public function messages(): array
     {
@@ -36,4 +35,3 @@ class ReadingPlanStoreRequest extends FormRequest
         ];
     }
 }
-

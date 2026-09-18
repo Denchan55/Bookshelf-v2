@@ -2,16 +2,18 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\Book;
 use App\Models\Genre;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 class BookAuthorizationTest extends TestCase
 {
     use RefreshDatabase;
 
+    #[Test]
     public function test_owner_can_access_edit_page()
     {
         $owner = User::factory()->create();
@@ -23,6 +25,7 @@ class BookAuthorizationTest extends TestCase
         $response->assertStatus(200);
     }
 
+    #[Test]
     public function test_non_owner_cannot_access_edit_page()
     {
         $owner = User::factory()->create();
@@ -35,6 +38,7 @@ class BookAuthorizationTest extends TestCase
         $response->assertStatus(403);
     }
 
+    #[Test]
     public function test_owner_can_update_book()
     {
         $user = User::factory()->create();
@@ -57,6 +61,7 @@ class BookAuthorizationTest extends TestCase
         $response->assertRedirect("/books/{$book->id}");
     }
 
+    #[Test]
     public function test_non_owner_cannot_update_book()
     {
         $owner = User::factory()->create();
@@ -80,6 +85,7 @@ class BookAuthorizationTest extends TestCase
         $response->assertStatus(403);
     }
 
+    #[Test]
     public function test_owner_can_delete_book()
     {
         $owner = User::factory()->create();
@@ -91,6 +97,7 @@ class BookAuthorizationTest extends TestCase
         $response->assertRedirect('/books');
     }
 
+    #[Test]
     public function test_non_owner_cannot_delete_book()
     {
         $owner = User::factory()->create();

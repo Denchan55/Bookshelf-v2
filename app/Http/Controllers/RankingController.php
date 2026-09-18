@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Book;
 
 class RankingController extends Controller
@@ -18,5 +17,4 @@ class RankingController extends Controller
 
         return view('ranking.index', compact('rankedBooks'));
     }
-    
 }

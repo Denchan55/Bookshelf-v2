@@ -2,17 +2,18 @@
 
 namespace Tests\Unit\Models;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Models\Book;
 use App\Models\Favorite;
 use App\Models\User;
-use App\Models\Book;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 class FavoriteTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function it_belongs_to_a_user()
     {
         $user = User::factory()->create();
@@ -26,7 +27,7 @@ class FavoriteTest extends TestCase
         $this->assertEquals($user->id, $favorite->user->id);
     }
 
-    /** @test */
+    #[Test]
     public function it_belongs_to_a_book()
     {
         $user = User::factory()->create();

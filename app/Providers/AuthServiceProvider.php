@@ -2,38 +2,31 @@
 
 namespace App\Providers;
 
-// use Illuminate\Support\Facades\Gate;
-use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use App\Models\Book;
+use App\Models\ReadingPlan;
 use App\Models\Review;
-use App\Models\Favorite;
 use App\Policies\BookPolicy;
+use App\Policies\ReadingPlanPolicy;
 use App\Policies\ReviewPolicy;
+use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
 {
-    /**
-     * The model to policy mappings for the application.
-     *
-     * @var array<class-string, class-string>
-     */
     protected $policies = [
-    Book::class => BookPolicy::class,
-    Review::class => ReviewPolicy::class,
-];
+        Book::class => BookPolicy::class,
+        Review::class => ReviewPolicy::class,
+        ReadingPlan::class => ReadingPlanPolicy::class,
+    ];
 
-
-    /**
-     * Register any authentication / authorization services.
-     */
     public function boot(): void
     {
-    \Illuminate\Support\Facades\Gate::define('update', function ($user, $book) {
-        return $user->id === $book->user_id;
-    });
-    \Illuminate\Support\Facades\Gate::define('delete', function ($user, $book) {
-    return $user->id === $book->user_id;
-});
+        Gate::define('update', function ($user, $book) {
+            return $user->id === $book->user_id;
+        });
+        Gate::define('delete', function ($user, $book) {
+            return $user->id === $book->user_id;
+        });
 
     }
 }
