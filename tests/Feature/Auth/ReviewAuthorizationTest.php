@@ -2,16 +2,18 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\Book;
 use App\Models\Review;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 class ReviewAuthorizationTest extends TestCase
 {
     use RefreshDatabase;
 
+    #[Test]
     public function test_owner_can_access_review_edit_page()
     {
         $owner = User::factory()->create();
@@ -27,6 +29,7 @@ class ReviewAuthorizationTest extends TestCase
         $response->assertStatus(200);
     }
 
+    #[Test]
     public function test_non_owner_cannot_access_review_edit_page()
     {
         $owner = User::factory()->create();
@@ -43,6 +46,7 @@ class ReviewAuthorizationTest extends TestCase
         $response->assertStatus(403);
     }
 
+    #[Test]
     public function test_owner_can_update_review()
     {
         $owner = User::factory()->create();
@@ -62,6 +66,7 @@ class ReviewAuthorizationTest extends TestCase
         $response->assertRedirect("/books/{$book->id}");
     }
 
+    #[Test]
     public function test_non_owner_cannot_update_review()
     {
         $owner = User::factory()->create();
@@ -82,6 +87,7 @@ class ReviewAuthorizationTest extends TestCase
         $response->assertStatus(403);
     }
 
+    #[Test]
     public function test_owner_can_delete_review()
     {
         $owner = User::factory()->create();
@@ -97,6 +103,7 @@ class ReviewAuthorizationTest extends TestCase
         $response->assertRedirect("/books/{$book->id}");
     }
 
+    #[Test]
     public function test_non_owner_cannot_delete_review()
     {
         $owner = User::factory()->create();

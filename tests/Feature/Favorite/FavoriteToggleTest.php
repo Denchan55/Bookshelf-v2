@@ -2,15 +2,17 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\Book;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 class FavoriteToggleTest extends TestCase
 {
     use RefreshDatabase;
 
+    #[Test]
     public function test_favorite_toggle_adds_favorite()
     {
         $user = User::factory()->create();
@@ -28,6 +30,7 @@ class FavoriteToggleTest extends TestCase
         ]);
     }
 
+    #[Test]
     public function test_favorite_toggle_removes_favorite()
     {
         $user = User::factory()->create();
@@ -35,7 +38,6 @@ class FavoriteToggleTest extends TestCase
 
         $book = Book::factory()->create();
 
-        // 事前にお気に入り登録
         $user->favoriteBooks()->attach($book->id);
 
         $response = $this->post("/favorites/{$book->id}/toggle");
@@ -48,6 +50,7 @@ class FavoriteToggleTest extends TestCase
         ]);
     }
 
+    #[Test]
     public function test_favorite_toggle_redirects_when_not_logged_in()
     {
         $book = Book::factory()->create();
@@ -57,12 +60,13 @@ class FavoriteToggleTest extends TestCase
         $response->assertRedirect('/login');
     }
 
+    #[Test]
     public function test_favorite_toggle_returns_404_for_nonexistent_book()
     {
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        $response = $this->post("/favorites/999999/toggle");
+        $response = $this->post('/favorites/999999/toggle');
 
         $response->assertStatus(404);
     }

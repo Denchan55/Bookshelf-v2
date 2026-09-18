@@ -2,19 +2,20 @@
 
 namespace Tests\Unit\Models;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Book;
-use App\Models\User;
+use App\Models\Favorite;
 use App\Models\Genre;
 use App\Models\Review;
-use App\Models\Favorite;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 class BookTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function it_belongs_to_a_user()
     {
         $user = User::factory()->create();
@@ -24,7 +25,7 @@ class BookTest extends TestCase
         $this->assertEquals($user->id, $book->user->id);
     }
 
-    /** @test */
+    #[Test]
     public function it_has_many_reviews()
     {
         $book = Book::factory()->create();
@@ -34,7 +35,7 @@ class BookTest extends TestCase
         $this->assertInstanceOf(Review::class, $book->reviews->first());
     }
 
-    /** @test */
+    #[Test]
     public function it_has_many_genres()
     {
         $book = Book::factory()->create();
@@ -46,7 +47,7 @@ class BookTest extends TestCase
         $this->assertInstanceOf(Genre::class, $book->genres->first());
     }
 
-    /** @test */
+    #[Test]
     public function it_has_many_favorites()
     {
         $book = Book::factory()->create();
@@ -56,7 +57,7 @@ class BookTest extends TestCase
         $this->assertInstanceOf(Favorite::class, $book->favorites->first());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_store_basic_attributes()
     {
         $book = Book::factory()->create([

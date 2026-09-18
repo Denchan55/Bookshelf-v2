@@ -2,22 +2,19 @@
 
 namespace Tests\Feature\Api;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Models\User;
 use App\Models\Book;
 use App\Models\Genre;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 class BookUpdateTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->actingAs(User::factory()->create());
-    }
-    private function createBook()
+    private function createBookFor(User $user)
     {
         $book = Book::factory()->create([
             'title' => '旧タイトル',
@@ -26,35 +23,25 @@ class BookUpdateTest extends TestCase
             'published_date' => '2020-01-01',
             'description' => '旧説明',
             'image_url' => 'https://example.com/old.jpg',
-            'user_id' => auth()->id(),
+            'user_id' => $user->id,
         ]);
 
         $genre = Genre::factory()->create();
         $book->genres()->sync([$genre->id]);
 
-        return $book;
+        return [$book, $genre];
     }
-    /** @test */
-    public function can_update_book()
+
+    #[Test]
+    public function owner_can_update_book()
     {
-        // 既存の本を作成
-        $book = Book::factory()->create([
-            'title' => '旧タイトル',
-            'author' => '旧著者',
-            'isbn' => '9781111111111',
-            'published_date' => '2020-01-01',
-            'description' => '旧説明',
-            'image_url' => 'https://example.com/old.jpg',
-            'user_id' => auth()->id(),
-        ]);
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
 
-        // 既存ジャンル
-        $genre1 = Genre::factory()->create();
-        $genre2 = Genre::factory()->create();
+        [$book, $oldGenre] = $this->createBookFor($user);
 
-        $book->genres()->sync([$genre1->id]);
+        $newGenre = Genre::factory()->create();
 
-        // 更新データ
         $payload = [
             'title' => '新タイトル',
             'author' => '新著者',
@@ -62,269 +49,339 @@ class BookUpdateTest extends TestCase
             'published_date' => '2024-01-01',
             'description' => '新しい説明文です。',
             'image_url' => 'https://example.com/new.jpg',
-            'genres' => [$genre2->id], // ⭐ sync が正しく動くか確認
+            'genres' => [$newGenre->id],
         ];
 
         $response = $this->putJson("/api/v1/books/{$book->id}", $payload);
 
-        // ステータスコード
-        $response->assertStatus(200);
+        $response->assertStatus(200)
+            ->assertJson([
+                'data' => [
+                    'title' => '新タイトル',
+                    'author' => '新著者',
+                    'isbn' => '9782222222222',
+                    'published_date' => '2024-01-01',
+                    'description' => '新しい説明文です。',
+                    'image_url' => 'https://example.com/new.jpg',
+                ],
+            ]);
 
-        // JSONレスポンス
-        $response->assertJson([
-            'data' => [
-                'title' => '新タイトル',
-                'author' => '新著者',
-                'isbn' => '9782222222222',
-                'published_date' => '2024-01-01T00:00:00.000000Z',
-                'description' => '新しい説明文です。',
-                'image_url' => 'https://example.com/new.jpg',
-            ]
-        ]);
-
-        // DBが更新されていること
-        $this->assertDatabaseHas('books', [
-            'id' => $book->id,
-            'title' => '新タイトル',
-            'author' => '新著者',
-            'isbn' => '9782222222222',
-        ]);
-
-        // ジャンルが更新されていること
-        $this->assertDatabaseHas('book_genre', [
+        $this->assertDatabaseHas('book_genres', [
             'book_id' => $book->id,
-            'genre_id' => $genre2->id,
+            'genre_id' => $newGenre->id,
         ]);
 
-        // 古いジャンルが外れていること
-        $this->assertDatabaseMissing('book_genre', [
+        $this->assertDatabaseMissing('book_genres', [
             'book_id' => $book->id,
-            'genre_id' => $genre1->id,
+            'genre_id' => $oldGenre->id,
         ]);
     }
 
-    /** @test */
-public function title_is_required()
-{
-    $book = $this->createBook();
+    #[Test]
+    public function non_owner_cannot_update_book()
+    {
 
-    $payload = [
-        'title' => '',
-        'author' => '新著者',
-        'isbn' => '9782222222222',
-        'published_date' => '2024-01-01',
-        'description' => '説明',
-        'genres' => [Genre::factory()->create()->id],
-    ];
+        $owner = User::factory()->create();
+        [$book] = $this->createBookFor($owner);
 
-    $this->putJson("/api/v1/books/{$book->id}", $payload)
-         ->assertStatus(422)
-         ->assertJsonValidationErrors(['title']);
-}
-/** @test */
-public function author_is_required()
-{
-    $book = $this->createBook();
+        $other = User::factory()->create();
+        Sanctum::actingAs($other);
 
-    $payload = [
-        'title' => '新タイトル',
-        'author' => '',
-        'isbn' => '9782222222222',
-        'published_date' => '2024-01-01',
-        'description' => '説明',
-        'genres' => [Genre::factory()->create()->id],
-    ];
+        $payload = [
+            'title' => '新タイトル',
+            'author' => '新著者',
+            'isbn' => '9782222222222',
+            'published_date' => '2024-01-01',
+            'description' => '説明',
+            'image_url' => 'https://example.com/new.jpg',
+            'genres' => [Genre::factory()->create()->id],
+        ];
 
-    $this->putJson("/api/v1/books/{$book->id}", $payload)
-         ->assertStatus(422)
-         ->assertJsonValidationErrors(['author']);
-}
-/** @test */
-public function description_must_be_string()
-{
-    $book = $this->createBook();
+        $response = $this->putJson("/api/v1/books/{$book->id}", $payload);
 
-    $payload = [
-        'title' => '新タイトル',
-        'author' => '新著者',
-        'isbn' => '9782222222222',
-        'published_date' => '2024-01-01',
-        'description' => 123,
-        'genres' => [Genre::factory()->create()->id],
-    ];
+        $response->assertStatus(403);
+    }
 
-    $this->putJson("/api/v1/books/{$book->id}", $payload)
-         ->assertStatus(422)
-         ->assertJsonValidationErrors(['description']);
-}
-/** @test */
-public function image_url_must_be_valid_url()
-{
-    $book = $this->createBook();
+    #[Test]
+    public function guest_cannot_update_book()
+    {
+        $owner = User::factory()->create();
+        [$book] = $this->createBookFor($owner);
 
-    $payload = [
-        'title' => '新タイトル',
-        'author' => '新著者',
-        'isbn' => '9782222222222',
-        'published_date' => '2024-01-01',
-        'description' => '説明',
-        'image_url' => 'invalid-url',
-        'genres' => [Genre::factory()->create()->id],
-    ];
+        $response = $this->putJson("/api/v1/books/{$book->id}", [
+            'title' => '新タイトル',
+        ]);
 
-    $this->putJson("/api/v1/books/{$book->id}", $payload)
-         ->assertStatus(422)
-         ->assertJsonValidationErrors(['image_url']);
-}
-/** @test */
-public function genres_is_required()
-{
-    $book = $this->createBook();
+        $response->assertStatus(401);
+    }
 
-    $payload = [
-        'title' => '新タイトル',
-        'author' => '新著者',
-        'isbn' => '9782222222222',
-        'published_date' => '2024-01-01',
-        'description' => '説明',
-        'genres' => null,
-    ];
+    #[Test]
+    public function title_is_required()
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
 
-    $this->putJson("/api/v1/books/{$book->id}", $payload)
-         ->assertStatus(422)
-         ->assertJsonValidationErrors(['genres']);
-}
-/** @test */
-public function genres_must_be_array()
-{
-    $book = $this->createBook();
+        [$book] = $this->createBookFor($user);
 
-    $payload = [
-        'title' => '新タイトル',
-        'author' => '新著者',
-        'isbn' => '9782222222222',
-        'published_date' => '2024-01-01',
-        'description' => '説明',
-        'genres' => 'not-array',
-    ];
+        $payload = [
+            'title' => '',
+            'author' => '新著者',
+            'isbn' => '9782222222222',
+            'published_date' => '2024-01-01',
+            'description' => '説明',
+            'genres' => [Genre::factory()->create()->id],
+        ];
 
-    $this->putJson("/api/v1/books/{$book->id}", $payload)
-         ->assertStatus(422)
-         ->assertJsonValidationErrors(['genres']);
-}
-/** @test */
-public function genres_must_exist()
-{
-    $book = $this->createBook();
+        $this->putJson("/api/v1/books/{$book->id}", $payload)
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['title']);
+    }
 
-    $payload = [
-        'title' => '新タイトル',
-        'author' => '新著者',
-        'isbn' => '9782222222222',
-        'published_date' => '2024-01-01',
-        'description' => '説明',
-        'genres' => [99999],
-    ];
+    #[Test]
+    public function author_is_required()
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
 
-    $this->putJson("/api/v1/books/{$book->id}", $payload)
-         ->assertStatus(422)
-         ->assertJsonValidationErrors(['genres.0']);
-}
-/** @test */
-public function isbn_is_required()
-{
-    $book = $this->createBook();
+        [$book, $oldGenre] = $this->createBookFor($user);
 
-    $payload = [
-        'title' => '新タイトル',
-        'author' => '新著者',
-        'isbn' => '',
-        'published_date' => '2024-01-01',
-        'description' => '説明',
-        'genres' => [Genre::factory()->create()->id],
-    ];
+        $payload = [
+            'title' => '新タイトル',
+            'author' => '',
+            'isbn' => '9782222222222',
+            'published_date' => '2024-01-01',
+            'description' => '説明',
+            'genres' => [Genre::factory()->create()->id],
+        ];
 
-    $this->putJson("/api/v1/books/{$book->id}", $payload)
-         ->assertStatus(422)
-         ->assertJsonValidationErrors(['isbn']);
-}
-/** @test */
-public function isbn_must_be_13_characters()
-{
-    $book = $this->createBook();
+        $this->putJson("/api/v1/books/{$book->id}", $payload)
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['author']);
+    }
 
-    $payload = [
-        'title' => '新タイトル',
-        'author' => '新著者',
-        'isbn' => '123',
-        'published_date' => '2024-01-01',
-        'description' => '説明',
-        'genres' => [Genre::factory()->create()->id],
-    ];
+    #[Test]
+    public function description_must_be_string()
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
 
-    $this->putJson("/api/v1/books/{$book->id}", $payload)
-         ->assertStatus(422)
-         ->assertJsonValidationErrors(['isbn']);
-}
-/** @test */
-public function isbn_must_be_unique_except_self()
-{
-    $book = $this->createBook();
+        [$book, $oldGenre] = $this->createBookFor($user);
 
-    // 別の本を作成（重複チェック用）
-    $other = Book::factory()->create([
-        'isbn' => '9789999999999',
-        'user_id' => auth()->id(),
-    ]);
+        $payload = [
+            'title' => '新タイトル',
+            'author' => '新著者',
+            'isbn' => '9782222222222',
+            'published_date' => '2024-01-01',
+            'description' => 123,
+            'genres' => [Genre::factory()->create()->id],
+        ];
 
-    $payload = [
-        'title' => '新タイトル',
-        'author' => '新著者',
-        'isbn' => '9789999999999', // 他の本と重複
-        'published_date' => '2024-01-01',
-        'description' => '説明',
-        'genres' => [Genre::factory()->create()->id],
-    ];
+        $this->putJson("/api/v1/books/{$book->id}", $payload)
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['description']);
+    }
 
-    $this->putJson("/api/v1/books/{$book->id}", $payload)
-         ->assertStatus(422)
-         ->assertJsonValidationErrors(['isbn']);
-}
-/** @test */
-public function published_date_is_required()
-{
-    $book = $this->createBook();
+    #[Test]
+    public function image_url_must_be_valid_url()
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
 
-    $payload = [
-        'title' => '新タイトル',
-        'author' => '新著者',
-        'isbn' => '9782222222222',
-        'published_date' => '',
-        'description' => '説明',
-        'genres' => [Genre::factory()->create()->id],
-    ];
+        [$book, $oldGenre] = $this->createBookFor($user);
 
-    $this->putJson("/api/v1/books/{$book->id}", $payload)
-         ->assertStatus(422)
-         ->assertJsonValidationErrors(['published_date']);
-}
-/** @test */
-public function published_date_must_be_valid_date()
-{
-    $book = $this->createBook();
+        $payload = [
+            'title' => '新タイトル',
+            'author' => '新著者',
+            'isbn' => '9782222222222',
+            'published_date' => '2024-01-01',
+            'description' => '説明',
+            'image_url' => 'invalid-url',
+            'genres' => [Genre::factory()->create()->id],
+        ];
 
-    $payload = [
-        'title' => '新タイトル',
-        'author' => '新著者',
-        'isbn' => '9782222222222',
-        'published_date' => 'invalid-date',
-        'description' => '説明',
-        'genres' => [Genre::factory()->create()->id],
-    ];
+        $this->putJson("/api/v1/books/{$book->id}", $payload)
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['image_url']);
+    }
 
-    $this->putJson("/api/v1/books/{$book->id}", $payload)
-         ->assertStatus(422)
-         ->assertJsonValidationErrors(['published_date']);
-}
+    #[Test]
+    public function genres_is_required()
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
 
+        [$book, $oldGenre] = $this->createBookFor($user);
+
+        $payload = [
+            'title' => '新タイトル',
+            'author' => '新著者',
+            'isbn' => '9782222222222',
+            'published_date' => '2024-01-01',
+            'description' => '説明',
+            'genres' => null,
+        ];
+
+        $this->putJson("/api/v1/books/{$book->id}", $payload)
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['genres']);
+    }
+
+    #[Test]
+    public function genres_must_be_array()
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
+        [$book, $oldGenre] = $this->createBookFor($user);
+
+        $payload = [
+            'title' => '新タイトル',
+            'author' => '新著者',
+            'isbn' => '9782222222222',
+            'published_date' => '2024-01-01',
+            'description' => '説明',
+            'genres' => 'not-array',
+        ];
+
+        $this->putJson("/api/v1/books/{$book->id}", $payload)
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['genres']);
+    }
+
+    #[Test]
+    public function genres_must_exist()
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
+        [$book, $oldGenre] = $this->createBookFor($user);
+
+        $payload = [
+            'title' => '新タイトル',
+            'author' => '新著者',
+            'isbn' => '9782222222222',
+            'published_date' => '2024-01-01',
+            'description' => '説明',
+            'genres' => [99999],
+        ];
+
+        $this->putJson("/api/v1/books/{$book->id}", $payload)
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['genres.0']);
+    }
+
+    #[Test]
+    public function isbn_is_required()
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
+        [$book, $oldGenre] = $this->createBookFor($user);
+
+        $payload = [
+            'title' => '新タイトル',
+            'author' => '新著者',
+            'isbn' => '',
+            'published_date' => '2024-01-01',
+            'description' => '説明',
+            'genres' => [Genre::factory()->create()->id],
+        ];
+
+        $this->putJson("/api/v1/books/{$book->id}", $payload)
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['isbn']);
+    }
+
+    #[Test]
+    public function isbn_must_be_13_characters()
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
+        [$book, $oldGenre] = $this->createBookFor($user);
+
+        $payload = [
+            'title' => '新タイトル',
+            'author' => '新著者',
+            'isbn' => '123',
+            'published_date' => '2024-01-01',
+            'description' => '説明',
+            'genres' => [Genre::factory()->create()->id],
+        ];
+
+        $this->putJson("/api/v1/books/{$book->id}", $payload)
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['isbn']);
+    }
+
+    #[Test]
+    public function isbn_must_be_unique_except_self()
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
+        [$book, $oldGenre] = $this->createBookFor($user);
+
+        $other = Book::factory()->create([
+            'isbn' => '9789999999999',
+            'user_id' => auth()->id(),
+        ]);
+
+        $payload = [
+            'title' => '新タイトル',
+            'author' => '新著者',
+            'isbn' => '9789999999999',
+            'published_date' => '2024-01-01',
+            'description' => '説明',
+            'genres' => [Genre::factory()->create()->id],
+        ];
+
+        $this->putJson("/api/v1/books/{$book->id}", $payload)
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['isbn']);
+    }
+
+    #[Test]
+    public function published_date_is_required()
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
+        [$book, $oldGenre] = $this->createBookFor($user);
+
+        $payload = [
+            'title' => '新タイトル',
+            'author' => '新著者',
+            'isbn' => '9782222222222',
+            'published_date' => '',
+            'description' => '説明',
+            'genres' => [Genre::factory()->create()->id],
+        ];
+
+        $this->putJson("/api/v1/books/{$book->id}", $payload)
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['published_date']);
+    }
+
+    #[Test]
+    public function published_date_must_be_valid_date()
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
+        [$book, $oldGenre] = $this->createBookFor($user);
+
+        $payload = [
+            'title' => '新タイトル',
+            'author' => '新著者',
+            'isbn' => '9782222222222',
+            'published_date' => 'invalid-date',
+            'description' => '説明',
+            'genres' => [Genre::factory()->create()->id],
+        ];
+
+        $this->putJson("/api/v1/books/{$book->id}", $payload)
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['published_date']);
+    }
 }

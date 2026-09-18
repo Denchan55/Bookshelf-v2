@@ -9,8 +9,8 @@ class Kernel extends ConsoleKernel
 {
     protected function schedule(Schedule $schedule)
     {
-        // 読書計画の通知を毎日自動で生成する
-        $schedule->command('reading-plan:notify')->daily();
+
+        $schedule->command('reading-plan:notify')->dailyAt('20:00');
     }
 
     protected function commands()

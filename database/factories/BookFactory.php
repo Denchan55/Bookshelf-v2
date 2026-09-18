@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class BookFactory extends Factory
 {
@@ -15,9 +15,9 @@ class BookFactory extends Factory
             'isbn' => $this->faker->unique()->isbn13(),
             'published_date' => $this->faker->date(),
             'description' => $this->faker->paragraph(),
-            'image_url' => 'https://placehold.co/200x300', // ★正しい値
-            'user_id' => User::factory(), // ★OK
-            // ★ genre_id は削除（複数ジャンル方式では不要）
+            'image_url' => 'https://placehold.co/200x300',
+            'user_id' => User::factory(),
+
         ];
     }
 }

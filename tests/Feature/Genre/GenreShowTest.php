@@ -2,16 +2,18 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
-use App\Models\User;
-use App\Models\Genre;
 use App\Models\Book;
+use App\Models\Genre;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 class GenreShowTest extends TestCase
 {
     use RefreshDatabase;
 
+    #[Test]
     public function test_genre_show_displays_genre_details()
     {
         $user = User::factory()->create();
@@ -25,6 +27,7 @@ class GenreShowTest extends TestCase
         $response->assertSee('小説');
     }
 
+    #[Test]
     public function test_genre_show_displays_related_books()
     {
         $user = User::factory()->create();
@@ -32,7 +35,6 @@ class GenreShowTest extends TestCase
 
         $genre = Genre::factory()->create(['name' => '小説']);
 
-        // 書籍を複数紐づける
         $books = Book::factory()->count(3)->create();
         $genre->books()->attach($books->pluck('id'));
 
@@ -45,6 +47,7 @@ class GenreShowTest extends TestCase
         }
     }
 
+    #[Test]
     public function test_genre_show_returns_404_for_nonexistent_genre()
     {
         $user = User::factory()->create();
@@ -55,6 +58,7 @@ class GenreShowTest extends TestCase
         $response->assertStatus(404);
     }
 
+    #[Test]
     public function test_genre_show_redirects_when_not_logged_in()
     {
         $genre = Genre::factory()->create(['name' => '小説']);
@@ -64,4 +68,3 @@ class GenreShowTest extends TestCase
         $response->assertRedirect('/login');
     }
 }
-

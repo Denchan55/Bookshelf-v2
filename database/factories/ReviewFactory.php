@@ -2,10 +2,10 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\Book;
 use App\Models\Review;
 use App\Models\User;
-use App\Models\Book;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ReviewFactory extends Factory
 {

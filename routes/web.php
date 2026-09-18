@@ -1,37 +1,30 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BookController;
-use App\Http\Controllers\GenreController;
 use App\Http\Controllers\FavoriteController;
+use App\Http\Controllers\GenreController;
+use App\Http\Controllers\MyReportController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RankingController;
+use App\Http\Controllers\ReadingPlanController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ReviewLikeController;
-use App\Http\Controllers\ReadingPlanController;
-use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\MyReportController;
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-*/
-
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return redirect('/books');
 });
 
-    Route::get('/books/isbn/{isbn}', [BookController::class, 'searchIsbn'])
+Route::get('/books/isbn/{isbn}', [BookController::class, 'searchIsbn'])
     ->where('isbn', '.*');
 
-    Route::get('/ranking', [RankingController::class, 'index'])->name('ranking.index');
+Route::get('/ranking', [RankingController::class, 'index'])->name('ranking.index');
 
-    Route::middleware('auth')->group(function () {
+Route::middleware('auth')->group(function () {
 
     Route::get('/books/create', [BookController::class, 'create'])
         ->name('books.create');
-    
+
     Route::post('/books', [BookController::class, 'store'])->name('books.store');
 
     Route::get('/genres', [GenreController::class, 'index'])->name('genres.index');
@@ -40,27 +33,27 @@ Route::get('/', function () {
     Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
     Route::post('/favorites/{book}/toggle', [FavoriteController::class, 'toggle'])
         ->name('favorites.toggle');
-    
+
     Route::post('/books/{book}/reviews', [ReviewController::class, 'store'])
-    ->name('reviews.store');
+        ->name('reviews.store');
     Route::post('/reviews/{review}/like', [ReviewLikeController::class, 'toggle'])
-    ->name('reviews.like');
+        ->name('reviews.like');
 
     Route::get('/reviews/{review}/edit', [ReviewController::class, 'edit'])
-    ->name('reviews.edit');
+        ->name('reviews.edit');
 
     Route::put('/reviews/{review}', [ReviewController::class, 'update'])
-    ->name('reviews.update');
+        ->name('reviews.update');
     Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])
-    ->name('reviews.destroy');
+        ->name('reviews.destroy');
 
     Route::get('/books/{book}/edit', [BookController::class, 'edit'])
-    ->name('books.edit');
+        ->name('books.edit');
     Route::put('/books/{book}', [BookController::class, 'update'])
-    ->name('books.update');
+        ->name('books.update');
 
     Route::delete('/books/{book}', [BookController::class, 'destroy'])
-    ->name('books.destroy');
+        ->name('books.destroy');
 
     Route::get('/reading-plans', [ReadingPlanController::class, 'index'])->name('reading-plans.index');
     Route::get('/reading-plans/create', [ReadingPlanController::class, 'create'])->name('reading-plans.create');
@@ -71,20 +64,21 @@ Route::get('/', function () {
     Route::delete('/reading-plans/{readingPlan}', [ReadingPlanController::class, 'destroy'])->name('reading-plans.destroy');
     Route::get('/reading-plans/create', [ReadingPlanController::class, 'create'])->name('reading-plans.create');
 
-    Route::post('/reading-plans', 
-    [ReadingPlanController::class, 'store']
-)->name('reading-plans.store');
+    Route::post('/reading-plans',
+        [ReadingPlanController::class, 'store']
+    )->name('reading-plans.store');
+    Route::patch('/reading-plans/{readingPlan}/status', [ReadingPlanController::class, 'updateStatus'])
+        ->name('reading-plans.status');
 
     Route::get('/reports', [MyReportController::class, 'index'])
-    ->name('reports.index');
+        ->name('reports.index');
 
     Route::get('/notifications', [NotificationController::class, 'index'])
         ->name('notifications.index');
     Route::post('/notifications/{notification}/read', [NotificationController::class, 'read'])
-    ->name('notifications.read');
-
+        ->name('notifications.read');
 
 });
 
-    Route::get('/books', [BookController::class, 'index'])->name('books.index');
-    Route::get('/books/{book}', [BookController::class, 'show'])->name('books.show');
+Route::get('/books', [BookController::class, 'index'])->name('books.index');
+Route::get('/books/{book}', [BookController::class, 'show'])->name('books.show');

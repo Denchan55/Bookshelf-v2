@@ -15,6 +15,8 @@ class ReadingPlanUpdateRequest extends FormRequest
     {
         return [
             'target_date' => ['required', 'date'],
+            'status' => ['required', 'string'],
+            'book_id' => ['required', 'exists:books,id'],
         ];
     }
 
@@ -23,7 +25,8 @@ class ReadingPlanUpdateRequest extends FormRequest
         return [
             'target_date.required' => '期日を入力してください。',
             'target_date.date' => '期日は正しい日付形式で入力してください。',
+            'status.required' => 'ステータスを入力してください。',
+            'book_id.required' => '本を選択してください。',
         ];
     }
 }
-

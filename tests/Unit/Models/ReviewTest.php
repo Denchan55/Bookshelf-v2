@@ -2,17 +2,18 @@
 
 namespace Tests\Unit\Models;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Models\Book;
 use App\Models\Review;
 use App\Models\User;
-use App\Models\Book;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 class ReviewTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function it_belongs_to_a_user()
     {
         $user = User::factory()->create();
@@ -27,7 +28,7 @@ class ReviewTest extends TestCase
         $this->assertEquals($user->id, $review->user->id);
     }
 
-    /** @test */
+    #[Test]
     public function it_belongs_to_a_book()
     {
         $user = User::factory()->create();

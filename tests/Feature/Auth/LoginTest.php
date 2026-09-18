@@ -2,14 +2,16 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 class LoginTest extends TestCase
 {
     use RefreshDatabase;
 
+    #[Test]
     public function test_login_success()
     {
         $user = User::factory()->create([
@@ -25,6 +27,7 @@ class LoginTest extends TestCase
         $this->assertAuthenticatedAs($user);
     }
 
+    #[Test]
     public function test_login_fails_with_wrong_password()
     {
         $user = User::factory()->create([
@@ -41,6 +44,7 @@ class LoginTest extends TestCase
         $this->assertGuest();
     }
 
+    #[Test]
     public function test_login_fails_with_nonexistent_email()
     {
         $response = $this->post('/login', [
@@ -53,6 +57,7 @@ class LoginTest extends TestCase
         $this->assertGuest();
     }
 
+    #[Test]
     public function test_logged_in_user_cannot_access_login_page()
     {
         $user = User::factory()->create();
@@ -63,4 +68,3 @@ class LoginTest extends TestCase
         $response->assertRedirect('/books');
     }
 }
-

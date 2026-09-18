@@ -4,22 +4,13 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-
 class ReviewStoreRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
@@ -27,16 +18,17 @@ class ReviewStoreRequest extends FormRequest
             'comment' => ['required', 'string', 'max:1000'],
         ];
     }
-        public function messages()
-{
-    return [
-        'rating.required' => '評価は必須です。',
-        'rating.integer'  => '評価は数値で入力してください。',
-        'rating.min'      => '評価は1~5の整数で入力してください。',
-        'rating.max'      => '評価は1~5の整数で入力してください。',
-        'comment.required' => 'コメントは必須です。',
-        'comment.max'      => 'コメントは1000文字以内で入力してください。',
-        'comment.string'   => 'コメントは文字列で入力してください。',
-    ];
-}
+
+    public function messages()
+    {
+        return [
+            'rating.required' => '評価は必須です。',
+            'rating.integer' => '評価は数値で入力してください。',
+            'rating.min' => '評価は1~5の整数で入力してください。',
+            'rating.max' => '評価は1~5の整数で入力してください。',
+            'comment.required' => 'コメントは必須です。',
+            'comment.max' => 'コメントは1000文字以内で入力してください。',
+            'comment.string' => 'コメントは文字列で入力してください。',
+        ];
+    }
 }

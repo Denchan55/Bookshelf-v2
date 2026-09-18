@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Book;
-use App\Models\Genre;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -28,7 +27,7 @@ class BookSeeder extends Seeder
                 'isbn' => '9784422100524',
                 'published_date' => '1936-10-01',
                 'description' => '人間関係を円滑にし、周囲の人と信頼関係を築くための考え方と方法を説いた名著。',
-                'genres' => [2,4],
+                'genres' => [2, 4],
             ],
             [
                 'title' => 'リーダブルコード',
@@ -44,7 +43,7 @@ class BookSeeder extends Seeder
                 'isbn' => '9784863940246',
                 'published_date' => '2013-08-30',
                 'description' => '主体的な生き方から相互依存まで、人生をより充実させるための七つの習慣を解説する。',
-                'genres' => [2,4],
+                'genres' => [2, 4],
             ],
             [
                 'title' => '坊っちゃん',
@@ -60,7 +59,7 @@ class BookSeeder extends Seeder
                 'isbn' => '9784309226712',
                 'published_date' => '2016-09-08',
                 'description' => 'ホモ・サピエンスの歴史を、認知革命から現代までの大きな流れで読み解く歴史書。',
-                'genres' => [6,7],
+                'genres' => [6, 7],
             ],
             [
                 'title' => 'Clean Code',
@@ -92,7 +91,7 @@ class BookSeeder extends Seeder
                 'isbn' => '9784822289607',
                 'published_date' => '2019-01-11',
                 'description' => '世界を思い込みではなくデータで見るための方法を示し、事実に基づく理解を促す一冊。',
-                'genres' => [2,7],
+                'genres' => [2, 7],
             ],
             [
                 'title' => 'コンテナ物語',
@@ -100,21 +99,21 @@ class BookSeeder extends Seeder
                 'isbn' => '9784822251468',
                 'published_date' => '2007-01-18',
                 'description' => 'コンテナが世界の物流と産業をどのように変えたのか、その歴史と影響を描くノンフィクション。',
-                'genres' => [2,6],
+                'genres' => [2, 6],
             ],
         ];
 
         foreach ($books as $index => $data) {
-            
+
             $book = Book::create([
-    'title' => $data['title'],
-    'author' => $data['author'],
-    'isbn' => $data['isbn'],
-    'published_date' => $data['published_date'],
-    'description' => $data['description'],
-    'image_url' => 'https://placehold.co/200x300/e2e8f0/475569?text=' . ($index + 1),
-    'user_id' => $users->random()->id,
-]);
+                'title' => $data['title'],
+                'author' => $data['author'],
+                'isbn' => $data['isbn'],
+                'published_date' => $data['published_date'],
+                'description' => $data['description'],
+                'image_url' => 'https://placehold.co/200x300/e2e8f0/475569?text='.($index + 1),
+                'user_id' => $users->random()->id,
+            ]);
 
             $book->genres()->sync($data['genres']);
         }

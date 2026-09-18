@@ -2,17 +2,18 @@
 
 namespace Tests\Feature\Api;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Book;
 use App\Models\Genre;
 use App\Models\Review;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 class BookIndexTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function can_get_books_list()
     {
         Book::factory()->count(3)->create();
@@ -20,27 +21,31 @@ class BookIndexTest extends TestCase
         $response = $this->getJson('/api/v1/books');
 
         $response->assertStatus(200)
-                ->assertJsonCount(3, 'data')
-                ->assertJsonStructure([
-                    'data' => [
-                        '*' => [
-                            'id',
-                            'title',
-                            'author',
-                            'isbn',
-                            'published_date',
-                            'image_url',
-                            'genres',
-                            'average_rating',
-                            'review_count',
-                        ]
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => [
+                        'id',
+                        'title',
+                        'author',
+                        'isbn',
+                        'published_date',
+                        'image_url',
+                        'genres' => [
+                            '*' => [
+                                'id',
+                                'name',
+                            ],
+                        ],
+                        'average_rating',
+                        'review_count',
                     ],
-                    'meta',
-                    'links',
-                ]);
+                ],
+                'meta',
+                'links',
+            ]);
     }
 
-    /** @test */
+    #[Test]
     public function can_filter_books_by_keyword()
     {
         Book::factory()->create(['title' => 'Laravel入門']);
@@ -49,11 +54,11 @@ class BookIndexTest extends TestCase
         $response = $this->getJson('/api/v1/books?keyword=Laravel');
 
         $response->assertStatus(200)
-                ->assertJsonCount(1, 'data')
-                ->assertJsonPath('data.0.title', 'Laravel入門');
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.title', 'Laravel入門');
     }
 
-    /** @test */
+    #[Test]
     public function can_filter_books_by_genre()
     {
         $genre = Genre::factory()->create();
@@ -61,16 +66,16 @@ class BookIndexTest extends TestCase
         $book1 = Book::factory()->create();
         $book1->genres()->attach($genre->id);
 
-        $book2 = Book::factory()->create(); // ジャンルなし
+        $book2 = Book::factory()->create();
 
         $response = $this->getJson("/api/v1/books?genre_id={$genre->id}");
 
         $response->assertStatus(200)
-                ->assertJsonCount(1, 'data')
-                ->assertJsonPath('data.0.id', $book1->id);
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', $book1->id);
     }
 
-    /** @test */
+    #[Test]
     public function can_paginate_books()
     {
         Book::factory()->count(20)->create();
@@ -78,11 +83,11 @@ class BookIndexTest extends TestCase
         $response = $this->getJson('/api/v1/books?per_page=5');
 
         $response->assertStatus(200)
-                ->assertJsonCount(5, 'data')
-                ->assertJsonPath('meta.per_page', 5);
+            ->assertJsonCount(5, 'data')
+            ->assertJsonPath('meta.per_page', 5);
     }
 
-    /** @test */
+    #[Test]
     public function books_include_average_rating_and_review_count()
     {
         $book = Book::factory()->create();
@@ -93,11 +98,13 @@ class BookIndexTest extends TestCase
         $response = $this->getJson('/api/v1/books');
 
         $response->assertStatus(200)
-                ->assertJsonPath('data.0.average_rating', "4.0")
-                ->assertJsonPath('data.0.review_count', 2);
+            ->assertJsonFragment([
+                'average_rating' => 4,
+                'review_count' => 2,
+            ]);
     }
 
-    /** @test */
+    #[Test]
     public function books_include_genres()
     {
         $genre = Genre::factory()->create(['name' => '技術書']);
@@ -107,35 +114,40 @@ class BookIndexTest extends TestCase
         $response = $this->getJson('/api/v1/books');
 
         $response->assertStatus(200)
-                ->assertJsonPath('data.0.genres.0.name', '技術書');
+            ->assertJsonFragment([
+                'name' => '技術書',
+            ]);
     }
-public function test_books_index_default_per_page_is_20()
-{
-    Book::factory()->count(50)->create();
 
-    $response = $this->getJson('/api/books');
+    #[Test]
+    public function default_per_page_is_20()
+    {
+        Book::factory()->count(50)->create();
 
-    $response->assertStatus(200)
-             ->assertJsonCount(20, 'data');
-}
-public function test_books_index_per_page_50()
-{
-    Book::factory()->count(100)->create();
+        $response = $this->getJson('/api/v1/books');
 
-    $response = $this->getJson('/api/books?per_page=50');
+        $response->assertStatus(200)
+            ->assertJsonCount(20, 'data');
+    }
 
-    $response->assertStatus(200)
-             ->assertJsonCount(50, 'data');
-}
-public function test_books_index_per_page_max_is_100()
-{
-    Book::factory()->count(200)->create();
+    #[Test]
+    public function per_page_50()
+    {
+        Book::factory()->count(100)->create();
 
-    $response = $this->getJson('/api/books?per_page=200');
+        $response = $this->getJson('/api/v1/books?per_page=50');
 
-    $response->assertStatus(200)
-             ->assertJsonCount(100, 'data');
-}
+        $response->assertStatus(200)
+            ->assertJsonCount(50, 'data');
+    }
 
+    #[Test]
+    public function test_books_index_per_page_max_is_100()
+    {
+        Book::factory()->count(200)->create();
 
+        $response = $this->getJson('/api/v1/books?per_page=200');
+
+        $response->assertStatus(422);
+    }
 }

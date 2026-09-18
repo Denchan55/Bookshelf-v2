@@ -7,10 +7,7 @@ use Illuminate\Validation\Rule;
 
 class UpdateBookRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-        public function authorize(): bool
+    public function authorize(): bool
     {
         return true;
     }
@@ -25,16 +22,16 @@ class UpdateBookRequest extends FormRequest
             'genres' => 'required|array',
             'genres.*' => 'exists:genres,id',
             'isbn' => [
-            'required',
-            'string',
-            'size:13',
-            Rule::unique('books')->ignore($this->book),
+                'required',
+                'string',
+                'size:13',
+                Rule::unique('books')->ignore($this->book),
             ],
             'published_date' => 'required|date',
         ];
     }
 
-public function messages()
+    public function messages()
     {
         return [
             'title.required' => 'タイトルは必須です。',

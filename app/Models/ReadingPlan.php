@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Enums\ReadingPlanStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class ReadingPlan extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'user_id',
         'book_id',
@@ -14,12 +17,16 @@ class ReadingPlan extends Model
         'target_date',
         'completed_at',
         'reminder_sent_at',
+        'deadline_today_sent_at',
+        'deadline_passed_sent_at',
+        'expired_sent_at',
     ];
 
     protected $casts = [
         'target_date' => 'date',
         'completed_at' => 'datetime',
-        'status' => \App\Enums\ReadingPlanStatus::class,
+        'status' => ReadingPlanStatus::class,
+        'expired_sent_at' => 'datetime',
     ];
 
     public function user()
